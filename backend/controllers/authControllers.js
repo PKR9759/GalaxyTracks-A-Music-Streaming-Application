@@ -1,42 +1,41 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
-const jwt = require('jwtwebtoken');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
-
 
 const registerUser = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
 
-    try {
+    console.log('Registering user with email:', email); // Debug log for incoming request
 
-        const userExists = await User.findOne({ email: email });
+    try {
+        // Check if user already exists
+        const userExists = await User.findOne({ email });
         if (userExists) {
+            console.log('User already exists:', email); // Debug log if user exists
             return res.status(400).json({ message: 'User already exists' });
         }
 
+        // Check if passwords match
         if (password !== confirmPassword) {
-            return res.status(400).json({ message: 'Password and confirm password not match' });
+            console.log('Password and confirm password do not match'); // Debug log for password mismatch
+            return res.status(400).json({ message: 'Password and confirm password do not match' });
         }
 
-        //hash password using bcrypt
+        // Hash password
         const hashPassword = await bcrypt.hash(password, 10);
+        console.log('Password hashed successfully'); // Debug log for successful hashing
 
-        const user = await User.create({
-            email: email,
-            password: hashPassword
-        })
+        // Create user
+        const user = await User.create({ email, password: hashPassword });
+        console.log('User created:', user); // Debug log for user creation
 
-        res.status(201).json({ message: "User registered successfully" });
-
-    }
-
-    catch (error) {
-
+        res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+        console.error('Error during registration:', error); // Debug log for caught errors
         res.status(500).json({ message: 'Server error' });
-
     }
-}
-
+};
 
 const loginUser = async (req, res) => {
 
