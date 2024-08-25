@@ -12,13 +12,13 @@ const registerUser = async (req, res) => {
         // Check if user already exists
         const userExists = await User.findOne({ email });
         if (userExists) {
-            console.log('User already exists:', email); // Debug log if user exists
+            
             return res.status(400).json({ message: 'User already exists' });
         }
 
         // Check if passwords match
         if (password !== confirmPassword) {
-            console.log('Password and confirm password do not match'); // Debug log for password mismatch
+            
             return res.status(400).json({ message: 'Password and confirm password do not match' });
         }
 
@@ -28,11 +28,10 @@ const registerUser = async (req, res) => {
 
         // Create user
         const user = await User.create({ email, password: hashPassword });
-        console.log('User created:', user); // Debug log for user creation
-
+        
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Error during registration:', error); // Debug log for caught errors
+        
         res.status(500).json({ message: 'Server error' });
     }
 };
