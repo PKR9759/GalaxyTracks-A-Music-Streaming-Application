@@ -1,51 +1,67 @@
-// controllers/homeController.js
+
 const axios = require('axios');
-const User = require('../models/User');
+const User = require('../models/userModel'); 
 
-const getHomePageData = async (req, res) => {
-    const userId = req.user.id; // Assuming JWT middleware handles user authentication
 
+exports.getHomePageData = async (req, res) => {
     try {
-        // Fetch user from the database
+        const userId = req.userId;  //remaining how we do it
         const user = await User.findById(userId);
-        const { listeningHistory } = user;
+        
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-        // Fetch song details from JioSaavn for each songId in the listening history
-        const listeningHistorySongs = await Promise.all(listeningHistory.map(async (entry) => {
-            const songId = entry.songId;
-            // Fetch song details from JioSaavn API using songId
-            const songDetailsResponse = await axios.get(`https://saavn.dev/api/song?id=${songId}`);
-            const songDetails = songDetailsResponse.data;
+        
+        const listeningHistory = user.listeningHistory.slice(-10); 
+        const historySongs = [];
+        
+        for (const history of listeningHistory) {
+            try {
+                const response = await axios.get(`https://saavn.dev/api/songs/${history.songId}`);
+                const song = response.data.data[0];  
+                historySongs.push({
+                    id: song.id,
+                    name: song.name,
+                    duration: song.duration,
+                    artist: song.artists.primary.map(artist => artist.name).join(', '),
+                    image: song.image?.[0]?.url || '',  // Get the first image URL if available
+                    url: song.url
+                });
+            } catch (error) {
+                console.error(`Error fetching song ${history.songId} from JioSaavn:`, error);
+            }
+        }
 
-            return {
-                songId: songDetails.id,
-                name: songDetails.name,
-                artist: songDetails.primaryArtists,
-                duration: songDetails.duration,  // Add song duration
-                playedAt: entry.playedAt,
-                image: songDetails.image[2].link // Assuming the image URL comes from JioSaavn
-            };
-        }));
+        
+        const latestReleases = [];
+        try {
+            const latestReleasesResponse = await axios.get('https://saavn.dev/api/latest'); 
+            const songs = latestReleasesResponse.data.data;
+            songs.forEach(song => {
+                latestReleases.push({
+                    id: song.id,
+                    name: song.name,
+                    duration: song.duration,
+                    artist: song.artists.primary.map(artist => artist.name).join(', '),
+                    image: song.image?.[0]?.url || '',
+                    url: song.url
+                });
+            });
+        } catch (error) {
+            console.error('Error fetching latest releases from JioSaavn:', error);
+        }
 
-        // Fetch latest releases from JioSaavn API
-        const latestReleaseResponse = await axios.get(`https://saavn.dev/api/search/songs?query=latest`);
-        const latestReleaseSongs = latestReleaseResponse.data.results.map(song => ({
-            name: song.name,
-            artist: song.primaryArtists,
-            duration: song.duration,  // Add song duration
-            image: song.image[2].link
-        }));
-
-        // Return both listening history songs and latest release songs
-        res.status(200).json({
-            listeningHistorySongs,
-            latestReleaseSongs,
+        // Return the data to the frontend
+        return res.json({
+            success: true,
+            data: {
+                historySongs,
+                latestReleases
+            }
         });
-
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error fetching home page data' });
+        console.error('Error fetching home page data:', error);
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
-
-module.exports = { getHomePageData };
