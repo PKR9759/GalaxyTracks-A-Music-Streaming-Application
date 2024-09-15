@@ -6,11 +6,16 @@ const homeRoutes = require('./routes/homeRoutes');
 const playlistRoutes = require('./routes/playlistRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const songRoutes = require('./routes/songRoutes');
+
 const cors= require('cors');
+const cookieParser = require('cookie-parser');
+
 
 const app = express();
 app.use(cors());
-const PORT =8000;
+app.use(cookieParser());
+const PORT =process.env.PORT;
 
 app.use(express.json());
 app.use('/api/auth',authRoutes);
@@ -18,6 +23,8 @@ app.use('/api/home', homeRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/category', categoryRoutes);
+app.use('/api/song', songRoutes);
+
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)

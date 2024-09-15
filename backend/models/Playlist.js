@@ -13,7 +13,7 @@ const playlistSchema = new mongoose.Schema({
     description: {
         type: String
     },
-    songs: [String]  // List of song IDs (strings)
+    songs: [String]  
 });
 
 module.exports = mongoose.model('Playlist', playlistSchema);
