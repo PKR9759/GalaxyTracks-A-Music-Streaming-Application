@@ -6,12 +6,30 @@ module.exports = {
   ],
   theme: {
     extend: {
-      boxShadow: {
-        'white-glow': '0 0 10px rgba(255, 255, 255, 0.5)',
-        'white-hover': '0 0 15px rgba(255, 255, 255, 0.8)',
-        'white-click': '0 0 20px rgba(255, 255, 255, 1), inset 0 0 10px rgba(255, 255, 255, 0.7)',
+      colors: {
+        
+        blue: {
+          DEFAULT: '#000000', // black
+          50: '#ffffff',      // white
+          100: '#000000',
+          200: '#000000',
+          300: '#000000',
+          400: '#000000',
+          500: '#000000',
+          600: '#000000',
+          700: '#000000',
+          800: '#000000',
+          900: '#000000',
+        },
+        
+        red: {
+          DEFAULT: '#ff0000',
+          500: '#ff0000',
+        },
       },
     },
   },
+  variants: {},
   plugins: [],
 }
+

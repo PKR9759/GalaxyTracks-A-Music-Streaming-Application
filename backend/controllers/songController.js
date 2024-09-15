@@ -5,7 +5,7 @@ exports.getSongDetails = async (req, res) => {
     try {
         const { songId } = req.params; 
         const response = await axios.get(`https://saavn.dev/api/songs/${songId}`);
-        console.log(response)
+        // console.log(response)
         const song = response.data.data[0]; 
 
         if (!song) {
@@ -25,7 +25,7 @@ exports.getSongDetails = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Error fetching song details:', error);
+        console.log('Error fetching song details:', error);
         return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
