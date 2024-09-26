@@ -42,16 +42,18 @@ const HomePage = () => {
             <div className="pt-20 px-8 space-y-10">
                 {/* Recently Played Section */}
                 <section>
-                    <h2 className="text-3xl font-bold text-red-500 mb-4">Recently Played</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <h2 className="text-4xl font-bold text-red-500 mb-4">Recently Played</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {history.map((song, index) => (
-                            <div key={index} className="bg-gray-900 p-4 rounded-lg shadow-lg hover:bg-gray-700 transition">
-                                <Link to={`/song/${song.songId}`} className="block text-center no-underline hover:no-underline">
-                                    {/* Placeholder for Album Art */}
-                                    <div className="bg-gray-800 h-32 mb-2 rounded-md"></div>
+                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
+                                <Link to={`/song/${song.songId}`} className="relative block text-center no-underline hover:no-underline">
+                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
+                                        <span className="text-gray-400">Album Art</span>
+                                    </div>
                                     <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-400 text-sm">{song.artist}</p>
-                                    <p className="text-gray-500 text-xs">Played At: {new Date(song.playedAt).toLocaleString()}</p>
+                                    <p className="text-gray-300 text-sm">{song.artist}</p>
+                                    <p className="text-gray-400 text-xs">Played At: {new Date(song.playedAt).toLocaleString()}</p>
                                 </Link>
                             </div>
                         ))}
@@ -60,14 +62,17 @@ const HomePage = () => {
 
                 {/* Latest Songs Section */}
                 <section>
-                    <h2 className="text-3xl font-bold text-red-500 mb-4">Latest Songs</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <h2 className="text-4xl font-bold text-red-500 mb-4">Latest Songs</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {latestSongs.map((song, index) => (
-                            <div key={index} className="bg-gray-900 p-4 rounded-lg shadow-lg hover:bg-gray-700 transition">
-                                <Link to={`/song/${song.id}`} className="block text-center no-underline hover:no-underline">
-                                    <div className="bg-gray-800 h-32 mb-2 rounded-md"></div>
+                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
+                                <Link to={`/song/${song.id}`} className="relative block text-center no-underline hover:no-underline">
+                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
+                                        <span className="text-gray-400">Album Art</span>
+                                    </div>
                                     <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-400 text-sm">{song.artist}</p>
+                                    <p className="text-gray-300 text-sm">{song.artist}</p>
                                 </Link>
                             </div>
                         ))}
@@ -76,14 +81,17 @@ const HomePage = () => {
 
                 {/* Trending Songs Section */}
                 <section>
-                    <h2 className="text-3xl font-bold text-red-500 mb-4">Trending Songs</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                    <h2 className="text-4xl font-bold text-red-500 mb-4">Trending Songs</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {trendingSongs.map((song, index) => (
-                            <div key={index} className="bg-gray-900 p-4 rounded-lg shadow-lg hover:bg-gray-700 transition">
-                                <Link to={`/song/${song.id}`} className="block text-center no-underline hover:no-underline">
-                                    <div className="bg-gray-800 h-32 mb-2 rounded-md"></div>
+                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
+                                <Link to={`/song/${song.id}`} className="relative block text-center no-underline hover:no-underline">
+                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
+                                        <span className="text-gray-400">Album Art</span>
+                                    </div>
                                     <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-400 text-sm">{song.artist}</p>
+                                    <p className="text-gray-300 text-sm">{song.artist}</p>
                                 </Link>
                             </div>
                         ))}
