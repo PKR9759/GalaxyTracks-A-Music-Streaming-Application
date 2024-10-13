@@ -5,15 +5,16 @@ require('dotenv').config();
 
 exports.getHomePageData = async (req, res) => {
     try {
+        // Get the token from the Authorization header
+        const authHeader = req.headers.authorization;
 
-        // Extract token from cookies
-        const token = req.cookies.token;
-
-        if (!token) {
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
             return res.status(401).json({ success: false, message: 'No token provided' });
         }
 
-        // Verify token and get userId
+        const token = authHeader.split(' ')[1]; // Extract the token from the "Bearer token"
+
+        // Verify token and extract userId
         let userId;
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -22,15 +23,14 @@ exports.getHomePageData = async (req, res) => {
             return res.status(401).json({ success: false, message: 'Invalid token' });
         }
 
-        // Find the user
+        // Find the user by their ID
         const user = await User.findById(userId);
-
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        // Retrieve listening history
-        const listeningHistory = user.listeningHistory.slice(-10);
+        // Retrieve the user's listening history
+        const listeningHistory = user.listeningHistory.slice(-10); // Get the last 10 songs
         const historySongs = [];
 
         for (const history of listeningHistory) {
@@ -53,8 +53,8 @@ exports.getHomePageData = async (req, res) => {
         // Retrieve latest releases
         const latestReleases = [];
         try {
-            const latestReleasesResponse = await axios.get('https://saavn.dev/api/latest');
-            const songs = latestReleasesResponse.data.data;
+            const latestReleasesResponse = await axios.get('https://saavn.dev/api/playlists?link=https://www.jiosaavn.com/featured/latest-hindi-songs/TRw,fDVtT7c14faDlWgB3A__');
+            const songs = latestReleasesResponse.data.data.songs;
             songs.forEach(song => {
                 latestReleases.push({
                     id: song.id,

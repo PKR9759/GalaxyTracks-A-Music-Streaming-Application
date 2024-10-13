@@ -6,10 +6,6 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profilePicture: { type: String },//url of the profile picture
-    preferences: {
-        genre: [String],
-        volume: { type: Number, default: 40 }
-    },
     listeningHistory: [
         {
             songId: { type: String },  // song ID from the API

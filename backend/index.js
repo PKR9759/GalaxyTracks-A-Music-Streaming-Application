@@ -7,6 +7,8 @@ const playlistRoutes = require('./routes/playlistRoutes');
 const searchRoutes = require('./routes/searchRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const songRoutes = require('./routes/songRoutes');
+const userRoutes =require('./routes/userRoutes');
+
 
 const cors= require('cors');
 const cookieParser = require('cookie-parser');
@@ -24,9 +26,9 @@ app.use('/api/playlists', playlistRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/song', songRoutes);
+app.use('/api/user', userRoutes);
 
-
-// MongoDB connection
+// MongoDB connection 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));

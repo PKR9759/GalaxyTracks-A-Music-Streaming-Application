@@ -40,9 +40,11 @@ const PlaylistPage = () => {
     return (
         <div className="bg-black min-h-screen p-4 text-white">
             {/* Header Section */}
-            <div className="relative w-full h-64 md:h-80 lg:h-96 flex items-center justify-center bg-cover bg-center rounded-lg overflow-hidden">
+            <div
+                className="relative w-full h-64 md:h-80 lg:h-96 flex items-center justify-center bg-cover bg-center rounded-lg overflow-hidden"
+                style={{ backgroundImage: `url(${playlist.coverImage})` }}
+            >
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-6">
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-600 to-transparent opacity-20"></div>
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white z-10">{playlist.name}</h1>
                     <p className="text-lg md:text-xl mt-2 z-10">{playlist.user}</p>
                     <p className="text-md md:text-lg mt-1 z-10">Songs: {playlist.numberOfSongs}</p>
@@ -56,7 +58,7 @@ const PlaylistPage = () => {
                     {playlist.songs.map((song) => (
                         <div
                             key={song.id}
-                            className="flex items-center p-2 bg-black rounded-lg shadow-md transition-colors duration-200 hover:bg-gray-800 relative"
+                            className="flex items-center p-2 bg-[#1F1F1F] rounded-lg shadow-md transition-colors duration-300 hover:bg-gray-500 relative"
                         >
                             {/* Song Image */}
                             <div
@@ -68,8 +70,6 @@ const PlaylistPage = () => {
                                 <h3 className="text-lg font-semibold">{song.title}</h3>
                                 <p className="text-sm text-gray-400">{song.artist}</p>
                             </div>
-                            {/* Subtle Red Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-red-700 to-transparent opacity-5 rounded-lg"></div>
                         </div>
                     ))}
                 </div>

@@ -1,59 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar'; // Updated path for Navbar component
+import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';  // Import Footer component
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import BASE_URL from '../apiConfig';
 
 const HomePage = () => {
     const [history, setHistory] = useState([]);
     const [latestSongs, setLatestSongs] = useState([]);
-    const [trendingSongs, setTrendingSongs] = useState([]);
+    const [error, setError] = useState(null);
+    
+    const navigate = useNavigate();
 
-    // Fetch dummy data for testing
     useEffect(() => {
-        const dummyHistory = [
-            { songId: '1', title: 'Shape of You', artist: 'Ed Sheeran', playedAt: '2023-09-10' },
-            { songId: '2', title: 'Blinding Lights', artist: 'The Weeknd', playedAt: '2023-09-12' },
-            { songId: '3', title: 'Levitating', artist: 'Dua Lipa', playedAt: '2023-09-14' },
-        ];
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+        } else {
+            const fetchHomePageData = async () => {
+                try {
+                    const response = await axios.get(`${BASE_URL}/home`, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
 
-        const dummyLatestSongs = [
-            { id: '101', title: 'Montero', artist: 'Lil Nas X' },
-            { id: '102', title: 'Industry Baby', artist: 'Lil Nas X & Jack Harlow' },
-            { id: '103', title: 'Peaches', artist: 'Justin Bieber' },
-        ];
-
-        const dummyTrendingSongs = [
-            { id: '201', title: 'Stay', artist: 'The Kid LAROI & Justin Bieber' },
-            { id: '202', title: 'Butter', artist: 'BTS' },
-            { id: '203', title: 'Good 4 U', artist: 'Olivia Rodrigo' },
-        ];
-
-        // Set dummy data
-        setHistory(dummyHistory);
-        setLatestSongs(dummyLatestSongs);
-        setTrendingSongs(dummyTrendingSongs);
-    }, []);
+                    const { historySongs, latestReleases } = response.data.data;
+                    setHistory(historySongs);
+                    setLatestSongs(latestReleases);
+                } catch (err) {
+                    console.error('Error fetching home page data:', err);
+                    setError('Failed to load data');
+                }
+            };
+            fetchHomePageData();
+        }
+    }, [navigate]);
 
     return (
         <div className="bg-black min-h-screen text-white">
-            {/* Navbar */}
             <Navbar />
 
-            {/* Main Content */}
-            <div className="pt-20 px-8 space-y-10">
+            <div className="pt-20 px-4 space-y-10">
                 {/* Recently Played Section */}
                 <section>
-                    <h2 className="text-4xl font-bold text-red-500 mb-4">Recently Played</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    <h2 className="text-3xl font-bold text-white mb-4">Recently Played</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {history.map((song, index) => (
-                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
-                                <Link to={`/song/${song.songId}`} className="relative block text-center no-underline hover:no-underline">
-                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
-                                        <span className="text-gray-400">Album Art</span>
+                            <div 
+                                key={index} 
+                                className="relative p-2 bg-gray-900 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-0 text-white"
+                                style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }} 
+                            >
+                                <Link 
+                                    to={`/song/${song.id}`} 
+                                    className="relative block text-center no-underline text-white hover:text-gray-300 focus:outline-none focus:ring-0"
+                                >
+                                    <div className="bg-gray-700 h-24 w-24 mb-2 rounded-md flex items-center justify-center mx-auto">
+                                        <img src={song.image} alt={`${song.name} Album Art`} className="h-full w-full object-cover rounded-md" />
                                     </div>
-                                    <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-300 text-sm">{song.artist}</p>
-                                    <p className="text-gray-400 text-xs">Played At: {new Date(song.playedAt).toLocaleString()}</p>
+                                    <p className="text-white text-sm">{song.name}</p>
+                                    <p className="text-gray-300 text-xs">{song.artist}</p>
                                 </Link>
                             </div>
                         ))}
@@ -62,42 +70,33 @@ const HomePage = () => {
 
                 {/* Latest Songs Section */}
                 <section>
-                    <h2 className="text-4xl font-bold text-red-500 mb-4">Latest Songs</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+                    <h2 className="text-3xl font-bold text-white mb-4">Latest Songs</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                         {latestSongs.map((song, index) => (
-                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
-                                <Link to={`/song/${song.id}`} className="relative block text-center no-underline hover:no-underline">
-                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
-                                        <span className="text-gray-400">Album Art</span>
+                            <div 
+                                key={index} 
+                                className="relative p-2 bg-gray-900 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-0 text-white"
+                                style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }} 
+                            >
+                                <Link 
+                                    to={`/song/${song.id}`} 
+                                    className="relative block text-center no-underline text-white hover:text-gray-300 focus:outline-none focus:ring-0"
+                                >
+                                    <div className="bg-gray-700 h-24 w-24 mb-2 rounded-md flex items-center justify-center mx-auto">
+                                        <img src={song.image} alt={`${song.name} Album Art`} className="h-full w-full object-cover rounded-md" />
                                     </div>
-                                    <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-300 text-sm">{song.artist}</p>
+                                    <p className="text-white text-sm">{song.name}</p>
+                                    <p className="text-gray-300 text-xs">{song.artist}</p>
                                 </Link>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                {/* Trending Songs Section */}
-                <section>
-                    <h2 className="text-4xl font-bold text-red-500 mb-4">Trending Songs</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                        {trendingSongs.map((song, index) => (
-                            <div key={index} className="bg-black relative p-4 rounded-lg shadow-md transition-transform duration-300 transform hover:scale-105 hover:shadow-2xl">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-transparent to-red-600 rounded-lg opacity-30"></div>
-                                <Link to={`/song/${song.id}`} className="relative block text-center no-underline hover:no-underline">
-                                    <div className="bg-gray-700 h-32 mb-2 rounded-md flex items-center justify-center">
-                                        <span className="text-gray-400">Album Art</span>
-                                    </div>
-                                    <p className="text-white text-lg">{song.title}</p>
-                                    <p className="text-gray-300 text-sm">{song.artist}</p>
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-                </section>
+                {error && <p className="text-red-500 text-center mt-4">{error}</p>}
             </div>
+
+            <Footer /> {/* Add Footer component */}
         </div>
     );
 };

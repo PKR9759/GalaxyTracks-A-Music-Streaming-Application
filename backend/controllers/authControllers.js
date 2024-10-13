@@ -28,8 +28,12 @@ const registerUser = async (req, res) => {
 
         // Create user
         const user = await User.create({ email, password: hashPassword });
-        
-        res.status(201).json({ message: 'User registered successfully' });
+
+        // Generate JWT token
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '12h' });
+
+        // Send response with the token
+        res.status(201).json({ message: 'User registered successfully', token, userId: user._id });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Server error' });
@@ -60,10 +64,7 @@ const loginUser = async (req, res) => {
         // Generate JWT token
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '12h' });
 
-        // Optional: Set token in an HTTP-only cookie
-        res.cookie('token', token);
-
-        // Send response
+        // Send response with the token
         res.status(200).json({ message: 'Login successful', token, userId: user._id });
 
     } catch (error) {
@@ -72,12 +73,9 @@ const loginUser = async (req, res) => {
     }
 };
 
-
 const logoutUser = (req, res) => {
     try {
-        // Clear the token cookie
-        res.cookie('token', '', { expires: new Date(0) });
-
+        // No need to clear token since it's stored in localStorage (handled on frontend)
         res.status(200).json({ message: 'Logout successful' });
     } catch (error) {
         console.error('Error logging out:', error);
@@ -86,6 +84,3 @@ const logoutUser = (req, res) => {
 };
 
 module.exports = { registerUser, loginUser, logoutUser };
-
-
-
