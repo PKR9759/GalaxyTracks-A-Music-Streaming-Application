@@ -54,7 +54,7 @@ const HomePage = () => {
                                 style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }} 
                             >
                                 <Link 
-                                    to={`/song/${song.id}`} 
+                                    to={`/player/${song.id}`} 
                                     className="relative block text-center no-underline text-white hover:text-gray-300 focus:outline-none focus:ring-0"
                                 >
                                     <div className="bg-gray-700 h-24 w-24 mb-2 rounded-md flex items-center justify-center mx-auto">
@@ -79,7 +79,7 @@ const HomePage = () => {
                                 style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }} 
                             >
                                 <Link 
-                                    to={`/song/${song.id}`} 
+                                    to={`/player/${song.id}`} 
                                     className="relative block text-center no-underline text-white hover:text-gray-300 focus:outline-none focus:ring-0"
                                 >
                                     <div className="bg-gray-700 h-24 w-24 mb-2 rounded-md flex items-center justify-center mx-auto">
