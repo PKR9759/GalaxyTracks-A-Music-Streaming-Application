@@ -39,7 +39,7 @@ const SearchPage = () => {
             const response = await axios.get(`${BASE_URL}/search/${searchQuery}`, {
                 params: { page:pageNumber }
             });
-
+            console.log("PAGE",pageNumber);
             if (response.data.success) {
                 if (pageNumber === 0) {
                     setSongs(response.data.songs);  // Set new songs for the first page
@@ -64,7 +64,7 @@ const SearchPage = () => {
 
     // Effect to fetch songs when query changes and the page is reset
     useEffect(() => {
-        if (query.trim() && page === 0) {
+        if (query.trim()) {
             searchSongs(query, page);  // Fetch results for the first page
         }
     }, [query, page]); // Fetch songs when the query or page changes
@@ -82,6 +82,7 @@ const SearchPage = () => {
                 setIsFetchingMore(true);  // Prevent multiple triggers of the next page
                   // Load the next page
                 setPage(prevPage => prevPage + 1);
+                console.log("page:",page)
             }
         };
 

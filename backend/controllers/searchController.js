@@ -1,11 +1,12 @@
 const axios = require('axios');
 
 const searchSongs = async (req, res) => {
-    const { query,page } = req.params; // This is the search query
-
+    const { query } = req.params; // This is the search query
+    const page=req.query.page;
+    // console.log(query,page);
     try {
         const response = await axios.get(`https://saavn.dev/api/search/songs`, {
-            params: { query ,page}
+            params: { query:query ,page:page}
         });
 
         if (!response.data.success) {
