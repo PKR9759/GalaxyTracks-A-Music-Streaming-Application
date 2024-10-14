@@ -1,28 +1,33 @@
 const axios = require('axios');
 
 const searchSongs = async (req, res) => {
-    const { query } = req.params;// this is serch query we will decide it further how to send
+    const { query,page } = req.params; // This is the search query
 
     try {
         const response = await axios.get(`https://saavn.dev/api/search/songs`, {
-            params: { query }
+            params: { query ,page}
         });
 
         if (!response.data.success) {
             return res.status(500).json({ success: false, message: 'Failed to fetch songs' });
         }
 
-        const songs = response.data.data.map(song => ({
+        // Map the results to the structure needed by the frontend
+        const songs = response.data.data.results.map(song => ({
             id: song.id,
             name: song.name,
-            artist: song.artists.primary[0]?.name || 'Unknown Artist',
-            album: song.album.name || 'Unknown Album',
-            duration: song.duration,
-            image: song.image[0]?.url || 'No Image'
+            artist: song.artists.primary[0]?.name || 'Unknown Artist', // First primary artist
+            album: song.album.name || 'Unknown Album',  // Album name
+            duration: song.duration || 0,  // Duration if available
+            image: song.image[0]?.url || 'No Image',  // First image URL if available
+            language: song.language || 'Unknown',  // Language if available
+            hasLyrics: song.hasLyrics || false,  // Whether the song has lyrics
+            url: song.url,  // Song URL (for playback or more details)
         }));
 
         res.status(200).json({ success: true, songs });
     } catch (error) {
+        console.error('Error fetching songs:', error.message);
         res.status(500).json({ success: false, message: 'Error fetching songs', error: error.message });
     }
 };

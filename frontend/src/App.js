@@ -10,6 +10,8 @@ import SparksPage from './pages/SparksPage';
 import PlaylistsPage from './pages/PlaylistsPage';
 import CreatePlaylistPage from './pages/CreatePlaylistPage';
 import PlayerPage from './pages/PlayerPage';
+import SearchPage from './pages/SearchPage';
+
 
 function App() {
   return (
@@ -27,6 +29,7 @@ function App() {
           <Route path="/sparks" element={<SparksPage />} />
           <Route path="/playlists" element={<PlaylistsPage />} />
           <Route path="/createPlaylist" element={<CreatePlaylistPage/>} />
+          <Route path="/search" element={<SearchPage />} />
 
 
         </Routes>
