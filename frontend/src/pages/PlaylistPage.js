@@ -5,6 +5,7 @@ import BASE_URL from '../apiConfig';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
+import {FaEllipsisV} from 'react-icons/fa' // Importing a playlist icon from Material Design icons
 
 const PlaylistPage = () => {
     const { playlistId } = useParams();
@@ -105,6 +106,9 @@ const PlaylistPage = () => {
                                         <h3 className="text-lg font-semibold">{song.title}</h3>
                                         <p className="text-gray-400">Artist: {song.primary_artists || 'Unknown'}</p>
                                         <p className="text-gray-400">Duration: {Math.round(song.duration / 60)} mins</p>
+                                        <button className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none">
+                            <FaEllipsisV />
+                        </button>
                                     </div>
                                 </div>
                             ))

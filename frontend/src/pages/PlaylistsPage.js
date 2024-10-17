@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { MdPlaylistPlay } from 'react-icons/md'; // Importing a playlist icon from Material Design icons
+import { MdPlaylistPlay } from 'react-icons/md';
+import {FaEllipsisV} from 'react-icons/fa' // Importing a playlist icon from Material Design icons
 import BASE_URL from '../apiConfig';
 
 const PlaylistsPage = () => {
@@ -37,14 +39,14 @@ const PlaylistsPage = () => {
     }, []);
 
     return (
-        <div className="bg-black min-h-screen text-white">
+        <div className="bg-black min-h-screen text-white flex flex-col">
             {/* Navbar */}
             <Navbar />
 
             {/* Main Content */}
-            <div className="pt-16 pb-16 px-8 space-y-10">
+            <div className="pt-16 pb-16 px-8 space-y-10 ">
                 {/* Your Playlists Section */}
-                <section>
+                <section className='mt-16'>
                     <h2 className="text-4xl font-bold mb-4 text-white">Your Playlists</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {/* "Create Playlist" Card */}
@@ -81,11 +83,15 @@ const PlaylistsPage = () => {
                                     <p className="text-white text-lg">{playlist.name}</p>
                                     <p className="text-gray-300 text-sm">Created by You</p>
                                 </Link>
+                                <button className="absolute top-2 right-2 text-white hover:text-gray-400 focus:outline-none">
+                        <FaEllipsisV />
+                    </button>
                             </div>
                         ))}
                     </div>
                 </section>
             </div>
+            <Footer/>
         </div>
     );
 };

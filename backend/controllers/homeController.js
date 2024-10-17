@@ -43,7 +43,7 @@ exports.getHomePageData = async (req, res) => {
                     duration: song.duration,
                     artist: song.artists.primary.map(artist => artist.name).join(', '),
                     image: song.image?.[0]?.url || '',
-                    url: song.url
+                    url: song.downloadUrl[0].url
                 });
             } catch (error) {
                 console.error(`Error fetching song ${history.songId} from JioSaavn:`, error);
@@ -61,8 +61,8 @@ exports.getHomePageData = async (req, res) => {
                     name: song.name,
                     duration: song.duration,
                     artist: song.artists.primary.map(artist => artist.name).join(', '),
-                    image: song.image?.[0]?.url || '',
-                    url: song.url
+                    image: song.image?.[1]?.url || '',
+                    url: song.downloadUrl[0].url
                 });
             });
         } catch (error) {

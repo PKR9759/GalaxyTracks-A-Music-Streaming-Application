@@ -4,7 +4,7 @@ import { FaSearch, FaUserCircle } from 'react-icons/fa';
 
 const Navbar = () => {
     return (
-        <nav className="bg-black text-white px-6 py-4 fixed w-full">
+        <nav className="bg-black text-white px-6 py-4 fixed w-full fixed top-0 left-0 w-full bg-black text-white p-4 z-10">
             <div className="flex justify-between items-center">
                 {/* Logo or Brand Name */}
                 <div className="flex flex-col items-start">

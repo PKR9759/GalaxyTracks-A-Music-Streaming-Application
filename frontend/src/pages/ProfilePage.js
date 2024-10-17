@@ -4,7 +4,8 @@ import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import { toast,ToastContainer } from 'react-toastify';
 import {useNavigate} from 'react-router-dom';
-
+import Navbar from '../components/Navbar'; // Import Navbar
+import Footer from '../components/Footer'; // Import Footer
 
 const ProfilePage = () => {
 
@@ -74,12 +75,16 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="bg-black min-h-screen p-8 text-white flex flex-col items-center">
+        <div>
+            <Navbar/>
+
+        <div className="bg-black min-h-screen p-8 text-white flex flex-col items-center mt-12">
             {/* Profile Header */}
-            <div className="relative w-full h-60 lg:h-[300px] flex items-center justify-center rounded-lg shadow-2xl mb-8 bg-gradient-to-r from-black via-gray-900 to-black">
-                <div className="absolute inset-0 flex flex-col items-center justify-center z-10">
+            
+            <div className=" w-full h-60 lg:h-[300px] flex items-center justify-center rounded-lg shadow-2xl mb-8 bg-gradient-to-r from-black via-gray-900 to-black">
+                <div className=" inset-0 flex flex-col items-center justify-center">
                     {/* Profile Picture */}
-                    <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden shadow-xl transform hover:scale-105 transition-transform duration-300">
+                    <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden shadow-xl transform hover:scale-105 transition-transform duration-300 z-0">
                         <img
                             src={userData.profilePicture || 
                                 "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTITJo17ykuTEOk1_ZURczbvHlLhnTJc2YEwg&s"
@@ -93,7 +98,7 @@ const ProfilePage = () => {
                         {userData.name}
                     </h1>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black opacity-70 rounded-lg"></div>
+                
             </div>
 
             {/* User Information Card */}
@@ -165,6 +170,9 @@ const ProfilePage = () => {
                 <FaSignOutAlt /> <span>Logout</span>
             </button>
             <ToastContainer/>
+            
+        </div>
+        <Footer/>
         </div>
     );
 };

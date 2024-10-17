@@ -3,6 +3,7 @@ import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
+import {FaEllipsisV} from 'react-icons/fa' // Importing a playlist icon from Material Design icons
 
 const SearchPage = () => {
     const [query, setQuery] = useState('');  // Search query
@@ -99,7 +100,7 @@ const SearchPage = () => {
     }, [page]); // Fetch songs when page changes
 
     return (
-        <div className="bg-black min-h-screen text-white">
+        <div className="bg-black min-h-screen text-white flex flex-col">
             <Navbar />
             <div className="pt-24 pb-16 px-4"> {/* Adjusted top padding */}
                 <h1 className="text-3xl font-bold mb-6">Search for Songs</h1>
@@ -140,6 +141,9 @@ const SearchPage = () => {
                                     <h3 className="text-lg font-semibold">{song.name}</h3>
                                     <p className="text-gray-400">Artist: {song.artist}</p>
                                     <p className="text-gray-400">Album: {song.album}</p>
+                                    <button className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none">
+                            <FaEllipsisV />
+                        </button>
                                 </div>
                             </div>
                         ))
