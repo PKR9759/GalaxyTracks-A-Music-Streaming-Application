@@ -68,18 +68,25 @@ const HomePage = () => {
         const token = localStorage.getItem('token');
         console.log(songId, playlistId);
         try {
-            await axios.post(`${BASE_URL}/playlists/${playlistId}/addSong/${songId}`,
-                {
+            const response = await axios.post(`${BASE_URL}/playlists/${playlistId}/addSong/${songId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-            toast.success('Song added to playlist!');
+    
+            // Assuming success response structure is similar to this:
+            if (response.data.success) {
+                toast.success('Song added to playlist!');
+            }
         } catch (err) {
             console.error('Error adding song to playlist:', err);
-            toast.error('Failed to add song to playlist.');
+            
+            // Check if the error response exists and has a message
+            const errorMessage = err.response?.data?.message || "Error adding song to playlist";
+            toast.error(errorMessage);
         }
     };
+    
 
 
     const toggleMenu = (index) => {
@@ -121,7 +128,7 @@ const HomePage = () => {
                                         {showMenuIndex === index && (
                                             <div className="absolute right-0 bg-gray-800 rounded-md shadow-lg mt-2 z-10 w-48 p-2"
                                                 style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }}>
-                                                <ul>
+                                                <ul className='max-h-32 overflow-y-auto'>
                                                     {playlists.map((playlist) => (
                                                         <li key={playlist.id}>
                                                             <button

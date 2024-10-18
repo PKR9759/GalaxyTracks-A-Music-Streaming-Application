@@ -161,7 +161,7 @@ const ProfilePage = () => {
 
                 <button
                     onClick={handleLogout}
-                    className="mt-8 flex items-center gap-2 bg-red-500 px-6 py-3 rounded-lg hover:bg-red-600 transition"
+                    className="mt-8 flex items-center gap-2 bg-black-300 border border-gray-600 px-6 py-3 rounded-lg hover:bg-red-600 transition"
                 >
                     <FaSignOutAlt /> Logout
                 </button>

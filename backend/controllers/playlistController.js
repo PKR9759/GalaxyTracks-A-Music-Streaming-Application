@@ -189,7 +189,7 @@ const addSongToPlaylist = async (req, res) => {
         }
 
         // Check if the songId is already in the playlist's songs array
-        if (playlist.songs.includes(songId)) {
+        if (playlist.songs.includes(songId.toString())) {
             return res.status(400).json({ success: false, message: 'Song already exists in the playlist' });
         }
 

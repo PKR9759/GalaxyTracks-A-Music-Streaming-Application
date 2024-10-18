@@ -22,7 +22,7 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post(`${BASE_URL}/auth/register`, { email, password });
+            const response = await axios.post(`${BASE_URL}/auth/register`, { email, password,confirmPassword });
             toast.success('Registration successful!');
 
             // Set token directly in localStorage
