@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import axios from 'axios'; 
-import BASE_URL from '../apiConfig'; // Import the base URL configuration
+import React, { useState,useContext } from 'react';
+import axios from 'axios';
+import BASE_URL from '../apiConfig';
 import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Import CSS for toast notifications
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
+
 
 const Register = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const navigate = useNavigate(); // Create an instance of useNavigate for redirection
+    const navigate = useNavigate();
+    const { setIsAuthenticated } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,12 +22,15 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post(`${BASE_URL}/auth/register`, { email, password, confirmPassword });
-            localStorage.setItem('token', response.data.token);
+            const response = await axios.post(`${BASE_URL}/auth/register`, { email, password });
             toast.success('Registration successful!');
-            
-            // After successful registration, redirect to the home page
-            navigate('/home'); // Adjust the path to your actual home page route
+
+            // Set token directly in localStorage
+            localStorage.setItem('token', response.data.token);
+            setIsAuthenticated(true); // Set isAuthenticated to true
+
+            // Redirect to home page
+            navigate('/home');
         } catch (error) {
             toast.error('Registration failed: ' + (error.response?.data?.message || 'Server error'));
         }
@@ -76,7 +82,6 @@ const Register = () => {
                 </p>
             </form>
 
-            {/* ToastContainer for displaying toast notifications */}
             <ToastContainer />
         </div>
     );

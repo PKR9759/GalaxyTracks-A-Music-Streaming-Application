@@ -7,7 +7,7 @@ const AboutUsPage = () => {
         <div className="bg-black min-h-screen text-white">
             <Navbar />
             <div className="pt-24 pb-16 px-4">
-                <h1 className="text-4xl font-bold text-center mb-8">About Us</h1>
+                <h1 className="text-3xl font-bold text-center mb-8">About Us</h1>
                 <p className="text-lg text-center mb-8">
                     Welcome to our music streaming application <strong>GalaxyTracks</strong>! We are passionate about bringing you the best music experience.
                 </p>

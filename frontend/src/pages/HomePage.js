@@ -1,5 +1,5 @@
+// src/pages/HomePage.js
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';  
 import axios from 'axios';
@@ -13,47 +13,44 @@ const HomePage = () => {
     const [error, setError] = useState(null);
     const [playlists, setPlaylists] = useState([]); // State to hold user's playlists
     const [showMenuIndex, setShowMenuIndex] = useState(-1); // To manage which menu to show
-    const navigate = useNavigate();
     const { updateTrackList, playTrack } = usePlayer(); // Use PlayerContext
 
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            navigate('/login');
-        } else {
-            const fetchHomePageData = async () => {
-                try {
-                    const response = await axios.get(`${BASE_URL}/home`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    const { historySongs, latestReleases } = response.data.data;
-                    setHistory(historySongs);
-                    setLatestSongs(latestReleases);
-                } catch (err) {
-                    console.error('Error fetching home page data:', err);
-                    setError('Failed to load data');
-                }
-            };
+        const fetchHomePageData = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BASE_URL}/home`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log(response);
+                const { historySongs, latestReleases } = response.data.data;
+                setHistory(historySongs);
+                setLatestSongs(latestReleases);
+            } catch (err) {
+                console.error('Error fetching home page data:', err);
+                setError('Failed to load data');
+            }
+        };
 
-            const fetchUserPlaylists = async () => {
-                try {
-                    const response = await axios.get(`${BASE_URL}/api/playlists`, {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                    setPlaylists(response.data.data); // Set fetched playlists
-                } catch (err) {
-                    console.error('Error fetching playlists:', err);
-                }
-            };
+        const fetchUserPlaylists = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BASE_URL}/api/playlists`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setPlaylists(response.data.data); // Set fetched playlists
+            } catch (err) {
+                console.error('Error fetching playlists:', err);
+            }
+        };
 
-            fetchHomePageData();
-            fetchUserPlaylists(); // Fetch playlists on load
-        }
-    }, [navigate]);
+        fetchHomePageData();
+        fetchUserPlaylists(); // Fetch playlists on load
+    }, []);
 
     const handlePlay = (songList, songIndex) => {
         const formattedTracks = songList.map(song => ({
@@ -73,7 +70,7 @@ const HomePage = () => {
                 songId,
             }, {
                 headers: {
-                    Authorization: ` Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             });
             alert('Song added to playlist!');
@@ -90,7 +87,7 @@ const HomePage = () => {
     return (
         <div className="bg-black min-h-screen text-white pb-16 flex flex-col">
             <Navbar />
-            <div className="pt-20 px-4 space-y-10 ">
+            <div className="pt-10 px-4 space-y-10 mb-16 ">
                 
                 <section className="mt-16">
                     <h2 className="text-3xl font-bold text-white mb-4">Latest Songs</h2>

@@ -5,7 +5,7 @@ import BASE_URL from '../apiConfig';
 import { toast } from 'react-toastify';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
-import {FaEllipsisV} from 'react-icons/fa' // Importing a playlist icon from Material Design icons
+import { FaEllipsisV } from 'react-icons/fa'; // Importing a playlist icon from Material Design icons
 
 const PlaylistPage = () => {
     const { playlistId } = useParams();
@@ -65,7 +65,7 @@ const PlaylistPage = () => {
     );
 
     return (
-        <div className="bg-black min-h-screen text-white">
+        <div className="bg-black min-h-screen text-white overflow-x-hidden"> {/* Prevent horizontal overflow */}
             <Navbar />
             <div className="pt-16 pb-16">
                 {/* Playlist Header */}
@@ -75,7 +75,7 @@ const PlaylistPage = () => {
                         backgroundImage: `url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAx3uMZCeAM9oi7493737U-bSOgBlqGI-eBg&s')`,
                     }}
                 >
-                    <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-6">
+                    <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-6 z-0">
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white z-10">{playlist.name}</h1>
                         <p className="text-md md:text-lg mt-1 z-10">Songs: {playlist.songs.length}</p>
                     </div>
@@ -89,27 +89,34 @@ const PlaylistPage = () => {
                             playlist.songs.map((song) => (
                                 <div
                                     key={song.id} // Use song.id as key if available
-                                    className="flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer" // Adjust scale and add translate on hover
+                                    className="relative flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer" // Adjust scale and add translate on hover
                                     onClick={() => navigate(`/player/${song.id}`)} // Redirect to the player with songId
+                                    style={{ maxWidth: '100%' }} // Ensure the card doesn't exceed the screen width
                                 >
                                     {/* Display song image */}
                                     {song.image && (
                                         <img
                                             src={song.image} // Use the image directly from the response
                                             alt={song.title}
-                                            className="w-14 h-14 rounded-lg mr-3" // Adjust image size
+                                            className="w-14 h-14 rounded-lg mr-3 flex-shrink-0" // Ensure the image doesn't shrink
                                         />
                                     )}
 
                                     {/* Song details */}
-                                    <div className="flex-1">
-                                        <h3 className="text-lg font-semibold">{song.title}</h3>
-                                        <p className="text-gray-400">Artist: {song.primary_artists || 'Unknown'}</p>
+                                    <div className="flex-1 overflow-hidden"> {/* Prevent overflow */}
+                                        <h3 className="text-lg font-semibold truncate"> {/* Truncate long song titles */}
+                                            {song.title}
+                                        </h3>
+                                        <p className="text-gray-400 truncate"> {/* Truncate artist name */}
+                                            Artist: {song.primary_artists || 'Unknown'}
+                                        </p>
                                         <p className="text-gray-400">Duration: {Math.round(song.duration / 60)} mins</p>
-                                        <button className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none">
-                            <FaEllipsisV />
-                        </button>
                                     </div>
+
+                                    {/* Button on the right-hand side */}
+                                    <button className="absolute top-1/2 transform -translate-y-1/2 right-4 text-white hover:text-gray-400 focus:outline-none">
+                                        <FaEllipsisV />
+                                    </button>
                                 </div>
                             ))
                         ) : (

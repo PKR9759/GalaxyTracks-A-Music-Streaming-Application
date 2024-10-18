@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '12h' });
 
         // Send response with the token
-        res.status(201).json({ message: 'User registered successfully', token, userId: user._id });
+        res.status(201).json({ message: 'User registered successfully', token });
     } catch (error) {
         console.error('Error registering user:', error);
         res.status(500).json({ message: 'Server error' });
@@ -65,7 +65,7 @@ const loginUser = async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '12h' });
 
         // Send response with the token
-        res.status(200).json({ message: 'Login successful', token, userId: user._id });
+        res.status(200).json({ message: 'Login successful', token});
 
     } catch (error) {
         console.error('Error logging in:', error);

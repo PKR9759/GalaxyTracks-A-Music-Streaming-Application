@@ -3,26 +3,31 @@ import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
-import {FaEllipsisV} from 'react-icons/fa' // Importing a playlist icon from Material Design icons
+import { FaEllipsisV } from 'react-icons/fa'; // Importing a playlist icon from Material Design icons
 
 const SearchPage = () => {
     const [query, setQuery] = useState('');  // Search query
     const [songs, setSongs] = useState([]);  // Search results
     const [loading, setLoading] = useState(false);  // Loading state
     const [error, setError] = useState(null);  // Error state
-    const [page, setPage] = useState(0);  // Current page number
+    const [page, setPage] = useState(1);  // Current page number (start from 1)
     const [hasMore, setHasMore] = useState(true);  // Check if more data is available
     const [isFetchingMore, setIsFetchingMore] = useState(false);  // Loading more state
 
-    // Debounce and trigger search when query changes
+    // Reset songs and pagination when query changes
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
-            if (query.trim()) {
+            const trimmedQuery = query.trim();
+            
+            if (trimmedQuery) {
                 setSongs([]); // Clear previous search results
-                setPage(0); // Reset to the first page for a new query
+                setPage(1); // Reset to the first page (start from page 1)
+                setHasMore(true); // Reset pagination availability
+                searchSongs(trimmedQuery, 1); // Trigger search on query change (start at page 1)
             } else {
                 setSongs([]); // Clear results if input is empty
-                setHasMore(true); // Reset hasMore to true when input is cleared
+                setHasMore(false); // Stop fetching more when input is cleared
+                setError(null); // Clear any error messages
             }
         }, 500);
 
@@ -31,18 +36,18 @@ const SearchPage = () => {
 
     // Fetch songs based on query and page number
     const searchSongs = async (searchQuery, pageNumber) => {
-        if (loading) return;  // Prevent duplicate requests
+        if (loading || !searchQuery.trim()) return;  // Prevent duplicate requests or empty queries
 
         setLoading(true);  // Set loading to true before fetching data
         setError(null);  // Clear any previous errors
 
         try {
             const response = await axios.get(`${BASE_URL}/search/${searchQuery}`, {
-                params: { page:pageNumber }
+                params: { page: pageNumber }
             });
-            console.log("PAGE",pageNumber);
+
             if (response.data.success) {
-                if (pageNumber === 0) {
+                if (pageNumber === 1) {  // First page
                     setSongs(response.data.songs);  // Set new songs for the first page
                 } else {
                     setSongs(prevSongs => [...prevSongs, ...response.data.songs]);  // Append songs for subsequent pages
@@ -54,6 +59,7 @@ const SearchPage = () => {
                 }
             } else {
                 setError('No songs found');
+                setHasMore(false);
             }
         } catch (err) {
             setError('Error searching for songs');
@@ -62,13 +68,6 @@ const SearchPage = () => {
             setIsFetchingMore(false);  // Reset the "fetching more" state
         }
     };
-
-    // Effect to fetch songs when query changes and the page is reset
-    useEffect(() => {
-        if (query.trim()) {
-            searchSongs(query, page);  // Fetch results for the first page
-        }
-    }, [query, page]); // Fetch songs when the query or page changes
 
     // Infinite scroll handler
     useEffect(() => {
@@ -79,25 +78,22 @@ const SearchPage = () => {
                 hasMore &&
                 !isFetchingMore
             ) {
-                
-                setIsFetchingMore(true);  // Prevent multiple triggers of the next page
-                  // Load the next page
-                setPage(prevPage => prevPage + 1);
-                console.log("page:",page)
+                setIsFetchingMore(true);
+                // Use the previous value to increment the page
+                setPage((prevPage) => prevPage + 1);
             }
         };
 
         window.addEventListener('scroll', handleScroll);
-
         return () => window.removeEventListener('scroll', handleScroll);  // Cleanup on unmount
     }, [hasMore, isFetchingMore]);
 
-    // Effect to fetch more songs when the page changes
+    // Fetch songs for the next page when page changes
     useEffect(() => {
-        if (page > 0) {  // Only fetch if page is greater than 0
+        if (page > 1 && query.trim()) {  // Fetch only if page > 1 to avoid duplicate fetch for page 1
             searchSongs(query, page);  // Fetch results for the current page
         }
-    }, [page]); // Fetch songs when page changes
+    }, [page]);
 
     return (
         <div className="bg-black min-h-screen text-white flex flex-col">
@@ -115,7 +111,7 @@ const SearchPage = () => {
                 />
 
                 {/* Loading indicator */}
-                {loading && page === 0 && <p className="mt-4 text-lg">Loading...</p>} {/* Show loading only for the first page */}
+                {loading && page === 1 && <p className="mt-4 text-lg">Loading...</p>} {/* Show loading only for the first page */}
 
                 {/* Error state */}
                 {error && <p className="mt-4 text-red-500">{error}</p>}
@@ -142,8 +138,8 @@ const SearchPage = () => {
                                     <p className="text-gray-400">Artist: {song.artist}</p>
                                     <p className="text-gray-400">Album: {song.album}</p>
                                     <button className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none">
-                            <FaEllipsisV />
-                        </button>
+                                        <FaEllipsisV />
+                                    </button>
                                 </div>
                             </div>
                         ))

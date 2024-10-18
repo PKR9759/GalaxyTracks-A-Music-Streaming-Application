@@ -44,10 +44,10 @@ const PlaylistsPage = () => {
             <Navbar />
 
             {/* Main Content */}
-            <div className="pt-16 pb-16 px-8 space-y-10 ">
+            <div className="pt-10 pb-16 px-8 space-y-10 ">
                 {/* Your Playlists Section */}
                 <section className='mt-16'>
-                    <h2 className="text-4xl font-bold mb-4 text-white">Your Playlists</h2>
+                    <h2 className="text-3xl font-bold mb-4 text-white">Your Playlists</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
                         {/* "Create Playlist" Card */}
                         <Link
