@@ -17,30 +17,54 @@ export const PlayerProvider = ({ children }) => {
     const updateTrackList = (newTrackList) => {
         setTrackList(newTrackList);
         setCurrentTrackIndex(0); // Default to play the first song in the list
+        setIsPlaying(true); // Start playing automatically when new songs are added
     };
 
-    // Function to play a specific track by index
-    const playTrack = (trackIndex) => {
-        setCurrentTrackIndex(trackIndex);
-        setIsPlaying(true);  // Play the track
+    // Play the selected track
+    const playTrack = (index) => {
+        setCurrentTrackIndex(index);
+        setIsPlaying(true);
     };
 
-    // Function to pause
+    // Pause the currently playing track
     const pauseTrack = () => {
-        setIsPlaying(false);  // Pause the track
+        setIsPlaying(false);
     };
+
+    // Play the next track
+    const nextTrack = () => {
+        if (currentTrackIndex < trackList.length - 1) {
+            playTrack(currentTrackIndex + 1);
+        }
+    };
+
+    // Play the previous track
+    const prevTrack = () => {
+        if (currentTrackIndex > 0) {
+            playTrack(currentTrackIndex - 1);
+        }
+    };
+
+    // Update the current track index
+    const updateCurrentTrackIndex = (index) => {
+        setCurrentTrackIndex(index);
+        setIsPlaying(true);
+    };
+
+    
 
     return (
-        <PlayerContext.Provider
-            value={{
-                trackList,
-                currentTrackIndex,
-                isPlaying,
-                updateTrackList,
-                playTrack,
-                pauseTrack,
-            }}
-        >
+        <PlayerContext.Provider value={{
+            trackList,
+            currentTrackIndex,
+            isPlaying,
+            updateTrackList,
+            playTrack,
+            pauseTrack,
+            nextTrack,
+            prevTrack,
+            updateCurrentTrackIndex,
+        }}>
             {children}
         </PlayerContext.Provider>
     );

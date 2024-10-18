@@ -7,7 +7,8 @@ import {
     FaStepForward, 
     FaVolumeUp, 
     FaVolumeDown, 
-    FaVolumeMute 
+    FaVolumeMute, 
+    FaTimes  
 } from 'react-icons/fa';
 
 const AudioPlayer = () => {
@@ -15,6 +16,8 @@ const AudioPlayer = () => {
     const [volume, setVolume] = useState(1.0);
     const [progress, setProgress] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
+    const [isMuted, setIsMuted] = useState(false);
+    const [isVisible, setIsVisible] = useState(true);
     const audioRef = useRef(null);
 
     const currentTrack = trackList[currentTrackIndex] || {};
@@ -24,16 +27,29 @@ const AudioPlayer = () => {
         const newVolume = parseFloat(e.target.value);
         setVolume(newVolume);
         if (audioRef.current) {
-            audioRef.current.volume = newVolume;
+            audioRef.current.volume = isMuted ? 0 : newVolume;
         }
     };
 
-    // Handle progress change
-    const handleProgressChange = (e) => {
+    // Mute/unmute audio
+    const toggleMute = () => {
+        setIsMuted(!isMuted);
         if (audioRef.current) {
-            const newTime = (e.target.value / 100) * audioRef.current.duration;
+            audioRef.current.volume = isMuted ? volume : 0;
+        }
+    };
+
+    // Handle progress change by clicking on the progress bar
+    const handleProgressChange = (e) => {
+        if (audioRef.current && audioRef.current.duration) {
+            const progressBar = e.target;
+            const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
+            const progressBarWidth = progressBar.clientWidth;
+            const newTime = (clickPosition / progressBarWidth) * audioRef.current.duration;
+
             audioRef.current.currentTime = newTime;
-            setProgress(e.target.value);
+            setProgress((newTime / audioRef.current.duration) * 100);
+            setIsSeeking(false);
         }
     };
 
@@ -53,64 +69,54 @@ const AudioPlayer = () => {
         playTrack(index);
     };
 
-    // Handle mouse down on the progress bar
-    const handleMouseDown = () => {
-        setIsSeeking(true);
-    };
+   
 
-    // Handle mouse up on the progress bar
-    const handleMouseUp = () => {
-        setIsSeeking(false);
-    };
-
-    // Seek within the track
-    const handleProgressClick = (e) => {
-        if (!isSeeking) return;
-
-        const progressBar = e.target;
-        const clickPosition = e.clientX - progressBar.getBoundingClientRect().left;
-        const progressBarWidth = progressBar.clientWidth;
-        const newTime = (clickPosition / progressBarWidth) * audioRef.current.duration;
-
-        audioRef.current.currentTime = newTime;
-        setProgress((newTime / audioRef.current.duration) * 100);
+    // Function to open the player
+    const handleOpenPlayer = () => {
+        setIsVisible(true);
+        if (audioRef.current) {
+            audioRef.current.volume = isMuted ? 0 : volume; // Set volume when opening
+        }
     };
 
     useEffect(() => {
         if (audioRef.current) {
+            audioRef.current.volume = isMuted ? 0 : volume;
             isPlaying ? audioRef.current.play() : audioRef.current.pause();
-        }
 
-        // Update progress when song ends
-        const onEnded = () => {
-            nextTrack(); // Play next track when current ends
-        };
-        
-        audioRef.current.addEventListener('ended', onEnded);
-        
-        return () => {
-            audioRef.current.removeEventListener('ended', onEnded);
-        };
-    }, [isPlaying, currentTrackIndex]);
+            const onEnded = () => {
+                nextTrack();
+            };
+
+            audioRef.current.addEventListener('ended', onEnded);
+
+            return () => {
+                if (audioRef.current) {
+                    audioRef.current.removeEventListener('ended', onEnded);
+                }
+            };
+        }
+    }, [isPlaying, currentTrackIndex, volume, isMuted, nextTrack]);
 
     useEffect(() => {
-        const intervalId = setInterval(updateProgress, 1000); // Update progress every second
+        const intervalId = setInterval(updateProgress, 1000);
         return () => clearInterval(intervalId);
     }, []);
 
+    if (!isVisible || !trackList.length) return null;
+
     return (
-        <div className={`fixed bottom-0 left-0 w-full p-4 bg-black border-t-2 border-gray-700 shadow-lg z-50 ${!trackList.length ? 'hidden' : ''}`}>
+        <div className="fixed bottom-0 left-0 w-full p-4 bg-black border-t-2 border-gray-700 shadow-lg z-50">
+            
             {/* Progress Bar */}
             <div 
                 className="mt-2 h-2 bg-gray-700 rounded-full cursor-pointer"
-                onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
-                onClick={handleProgressClick}
-                style={{ padding: '0 10px' }} // Add padding to the progress bar
+                onClick={handleProgressChange}
+                style={{ padding: '0 10px' }}
             >
                 <div 
                     className="h-full bg-blue-500 rounded-full"
-                    style={{ width: `${progress}%` }}
+                    style={{ width: `${progress}% `}}
                 />
             </div>
 
@@ -144,7 +150,7 @@ const AudioPlayer = () => {
                         {/* Previous Track */}
                         <button
                             className="text-white p-2 rounded-full hover:bg-gray-800 transition"
-                            onClick={() => handlePlayTrack(currentTrackIndex - 1)}
+                            onClick={prevTrack}
                             disabled={currentTrackIndex === 0}
                         >
                             <FaStepBackward size={24} />
@@ -161,7 +167,7 @@ const AudioPlayer = () => {
                         {/* Next Track */}
                         <button
                             className="text-white p-2 rounded-full hover:bg-gray-800 transition"
-                            onClick={() => handlePlayTrack(currentTrackIndex + 1)}
+                            onClick={nextTrack}
                             disabled={currentTrackIndex === trackList.length - 1}
                         >
                             <FaStepForward size={24} />
@@ -170,42 +176,35 @@ const AudioPlayer = () => {
                 </div>
 
                 {/* Volume Control */}
-                <div className="flex items-center space-x-2 w-1/4 ml-auto">
-                    {volume === 0 ? (
-                        <FaVolumeMute size={24} />
-                    ) : volume < 0.5 ? (
-                        <FaVolumeDown size={24} />
-                    ) : (
-                        <FaVolumeUp size={24} />
-                    )}
+                <div className="w-1/3 flex items-center justify-end space-x-2">
+                    {volume > 0.7 && <FaVolumeUp />}
+                    {volume > 0 && volume <= 0.7 && <FaVolumeDown />}
+                    {volume === 0 && <FaVolumeMute />}
                     <input
                         type="range"
                         min="0"
                         max="1"
                         step="0.01"
-                        value={volume}
+                        value={isMuted ? 0 : volume}
                         onChange={handleVolumeChange}
-                        className="w-24 h-1 bg-gray-700 rounded-full"
+                        className="w-24 h-1 bg-gray-400 rounded-full"
                     />
+                    <button onClick={toggleMute} className="text-white">
+                        {isMuted ? <FaVolumeMute size={24} /> : (volume > 0.7 ? <FaVolumeUp size={24} /> : <FaVolumeDown size={24} />)}
+                    </button>
                 </div>
             </div>
 
-            {/* Audio Element */}
-            <audio
-                ref={audioRef}
-                src={currentTrack.url}
-                controls={false}
-                onEnded={nextTrack} // Automatically play the next track when the current one ends
-            />
+            <audio ref={audioRef} src={currentTrack?.url || ''} />
         </div>
     );
 };
 
-// Function to format time from seconds to MM:SS
+// Helper function to format time
 const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${minutes}:${secs < 10 ? '0' + secs : secs}`;
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
 };
 
 export default AudioPlayer;

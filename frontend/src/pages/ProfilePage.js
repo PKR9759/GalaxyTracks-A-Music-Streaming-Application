@@ -4,8 +4,8 @@ import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import { toast, ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar'; // Import Navbar
-import Footer from '../components/Footer'; // Import Footer
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
 
 const ProfilePage = () => {
     const navigate = useNavigate();
@@ -15,7 +15,7 @@ const ProfilePage = () => {
         profilePicture: '',
     });
     const [isEditing, setIsEditing] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null); // For handling local image upload
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -51,6 +51,13 @@ const ProfilePage = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
+        
+        // Check file size (example: limit to 1MB)
+        if (file && file.size > 1000000) {
+            toast.error('File size too large. Please upload an image smaller than 1MB.');
+            return;
+        }
+
         if (file) {
             const reader = new FileReader();
             reader.onloadend = () => {
@@ -73,6 +80,7 @@ const ProfilePage = () => {
             });
             toast.success('Profile updated successfully');
             setIsEditing(false);
+            setSelectedImage(null); // Clear the selected image after success
         } catch (error) {
             toast.error('Error updating profile');
         }
@@ -82,10 +90,8 @@ const ProfilePage = () => {
         <div>
             <Navbar />
             <div className="bg-black min-h-screen p-8 text-white flex flex-col items-center mt-12">
-                {/* Profile Header */}
                 <div className="w-full h-60 lg:h-[300px] flex items-center justify-center rounded-lg shadow-2xl mb-8 bg-gradient-to-r from-black via-gray-900 to-black">
                     <div className=" inset-0 flex flex-col items-center justify-center">
-                        {/* Profile Picture */}
                         <div className="w-32 h-32 lg:w-40 lg:h-40 rounded-full overflow-hidden shadow-xl transform hover:scale-105 transition-transform duration-300 z-0">
                             <img
                                 src={selectedImage || userData.profilePicture || 
@@ -101,7 +107,6 @@ const ProfilePage = () => {
                     </div>
                 </div>
 
-                {/* User Information Card */}
                 <div className="w-full lg:w-2/3 p-6 rounded-lg shadow-2xl bg-[#1F1F1F] backdrop-blur-sm border border-gray-600">
                     <h2 className="text-2xl font-semibold mb-4 text-white">Profile Information</h2>
                     {isEditing ? (
@@ -144,23 +149,25 @@ const ProfilePage = () => {
                         <div className="space-y-3 text-gray-300">
                             <p className="text-lg"><strong>Name:</strong> {userData.name}</p>
                             <p className="text-lg"><strong>Email:</strong> {userData.email}</p>
-                            <button className="mt-4 px-4 py-2 bg-gray-700 rounded-lg" onClick={() => setIsEditing(true)}>
+                            <button
+                                onClick={() => setIsEditing(true)}
+                                className="mt-4 px-4 py-2 bg-gray-700 rounded-lg"
+                            >
                                 Edit Profile
                             </button>
                         </div>
                     )}
                 </div>
 
-                {/* Logout Button */}
                 <button
                     onClick={handleLogout}
-                    className="mt-8 px-6 py-2 bg-[#333] hover:bg-[#555] rounded-full text-white text-lg flex items-center space-x-2 shadow-md transform hover:scale-105 transition-all hover:shadow-gray-500/50"
+                    className="mt-8 flex items-center gap-2 bg-red-500 px-6 py-3 rounded-lg hover:bg-red-600 transition"
                 >
-                    <FaSignOutAlt /> <span>Logout</span>
+                    <FaSignOutAlt /> Logout
                 </button>
-                <ToastContainer />
             </div>
             <Footer />
+            <ToastContainer />
         </div>
     );
 };

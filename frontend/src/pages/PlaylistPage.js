@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import { toast } from 'react-toastify';
-import Navbar from '../components/Navbar'; // Import Navbar
-import Footer from '../components/Footer'; // Import Footer
-import { FaEllipsisV } from 'react-icons/fa'; // Importing a playlist icon from Material Design icons
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import { FaEllipsisV } from 'react-icons/fa'; 
+import { usePlayer } from '../contexts/PlayerContext'; // Import usePlayer
 
 const PlaylistPage = () => {
     const { playlistId } = useParams();
-    const navigate = useNavigate(); // Initialize the useNavigate hook
+    const navigate = useNavigate();
+    const { updateTrackList, playTrack } = usePlayer(); // Destructure from usePlayer
     const [playlist, setPlaylist] = useState(null);
-    const [loading, setLoading] = useState(true); // Loading state
+    const [loading, setLoading] = useState(true);
 
-    // Fetch the playlist details
     useEffect(() => {
         const fetchPlaylist = async () => {
             try {
@@ -22,38 +23,35 @@ const PlaylistPage = () => {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
-                // Check if the response contains a playlist
                 if (response.data.success) {
-                    setPlaylist(response.data.playlist); // Set the playlist details from the response
+                    setPlaylist(response.data.playlist);
                 } else {
                     toast.error('Playlist not found.');
-                    setPlaylist(null); // Set playlist to null if not found
+                    setPlaylist(null);
                 }
             } catch (error) {
                 toast.error('Error fetching playlist: ' + (error.response?.data?.message || 'Server error'));
                 setPlaylist(null);
             } finally {
-                setLoading(false); // Set loading to false after the request completes
+                setLoading(false);
             }
         };
 
         fetchPlaylist();
     }, [playlistId]);
 
-    // Display loading indicator while fetching data
     if (loading) {
         return (
             <div className="bg-black min-h-screen text-white">
                 <Navbar />
                 <div className="pt-16 pb-16 flex justify-center items-center">
-                    <div className="text-lg">Loading...</div> {/* Loading indicator */}
+                    <div className="text-lg">Loading...</div>
                 </div>
                 <Footer />
             </div>
         );
     }
 
-    // If the playlist is not found after loading
     if (!playlist) return (
         <div className="bg-black min-h-screen text-white">
             <Navbar />
@@ -64,8 +62,19 @@ const PlaylistPage = () => {
         </div>
     );
 
+    const handlePlaySong = (song) => {
+        const formattedTracks = playlist.songs.map(song => ({
+            url: song.url,
+            title: song.name,
+            tags: [song.artist],
+            image: song.image,
+        }));
+        updateTrackList(formattedTracks);
+        playTrack(playlist.songs.indexOf(song)); // Pass the index of the song
+    };
+
     return (
-        <div className="bg-black min-h-screen text-white overflow-x-hidden"> {/* Prevent horizontal overflow */}
+        <div className="bg-black min-h-screen text-white overflow-x-hidden">
             <Navbar />
             <div className="pt-16 pb-16">
                 {/* Playlist Header */}
@@ -88,39 +97,21 @@ const PlaylistPage = () => {
                         {playlist.songs.length > 0 ? (
                             playlist.songs.map((song) => (
                                 <div
-                                    key={song.id} // Use song.id as key if available
-                                    className="relative flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer" // Adjust scale and add translate on hover
-                                    onClick={() => navigate(`/player/${song.id}`)} // Redirect to the player with songId
-                                    style={{ maxWidth: '100%' }} // Ensure the card doesn't exceed the screen width
+                                    key={song.id}
+                                    className="relative flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer"
+                                    onClick={() => handlePlaySong(song)} // Updated to handlePlaySong
                                 >
-                                    {/* Display song image */}
-                                    {song.image && (
-                                        <img
-                                            src={song.image} // Use the image directly from the response
-                                            alt={song.title}
-                                            className="w-14 h-14 rounded-lg mr-3 flex-shrink-0" // Ensure the image doesn't shrink
-                                        />
-                                    )}
-
-                                    {/* Song details */}
-                                    <div className="flex-1 overflow-hidden"> {/* Prevent overflow */}
-                                        <h3 className="text-lg font-semibold truncate"> {/* Truncate long song titles */}
-                                            {song.title}
-                                        </h3>
-                                        <p className="text-gray-400 truncate"> {/* Truncate artist name */}
-                                            Artist: {song.primary_artists || 'Unknown'}
-                                        </p>
-                                        <p className="text-gray-400">Duration: {Math.round(song.duration / 60)} mins</p>
+                                    <div className="relative block text-center">
+                                        <div className="bg-gray-700 h-24 w-24 mb-2 rounded-md flex items-center justify-center mx-auto">
+                                            <img src={song.image} alt={`${song.name} Album Art`} className="h-full w-full object-cover rounded-md" />
+                                        </div>
+                                        <p className="text-white text-sm">{song.name}</p>
+                                        <p className="text-gray-300 text-xs">{song.artist}</p>
                                     </div>
-
-                                    {/* Button on the right-hand side */}
-                                    <button className="absolute top-1/2 transform -translate-y-1/2 right-4 text-white hover:text-gray-400 focus:outline-none">
-                                        <FaEllipsisV />
-                                    </button>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-400">No songs available in this playlist.</p>
+                            <div>No songs available in this playlist.</div>
                         )}
                     </div>
                 </div>

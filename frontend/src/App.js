@@ -21,41 +21,30 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="bg-black min-h-screen text-white">
-          <Routes>
-            
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-
-            
-            <Route element={<ProtectedRoute />}>
-            
-              {/* <Route element={<PlayerProvider />}>  */}
-                <Route path="/" element={<Navigate to="/home" />} />
-                <Route path="/home" element={<HomePage />} />
-                <Route path="/player/:songId" element={<PlayerPage />} />
-                <Route path="/playlist/:playlistId" element={<PlaylistPage />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/sparks" element={<SparksPage />} />
-                <Route path="/playlists" element={<PlaylistsPage />} />
-                <Route path="/createPlaylist" element={<CreatePlaylistPage />} />
-                <Route path="/search" element={<SearchPage />} />
-                <Route path="/about" element={<AboutUsPage />} />
-                <Route path="*" element={<NotFoundPage />} />
-
-              {/* </Route> */}
-            </Route>
-            
-            
-
-            
-          </Routes>
-          
-          {/* AudioPlayer inside PlayerProvider */}
-          <PlayerProvider>
-            <AudioPlayer />
-          </PlayerProvider>
-        </div>
+        <PlayerProvider>
+          <div className="bg-black min-h-screen text-white flex flex-col">
+            <div className="flex-grow overflow-y-auto"> {/* Content area */}
+              <Routes>
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/" element={<Navigate to="/home" />} />
+                  <Route path="/home" element={<HomePage />} />
+                  <Route path="/player/:songId" element={<PlayerPage />} />
+                  <Route path="/playlist/:playlistId" element={<PlaylistPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/sparks" element={<SparksPage />} />
+                  <Route path="/playlists" element={<PlaylistsPage />} />
+                  <Route path="/createPlaylist" element={<CreatePlaylistPage />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/about" element={<AboutUsPage />} />
+                  <Route path="*" element={<NotFoundPage />} />
+                </Route>
+              </Routes>
+            </div>
+            <AudioPlayer /> {/* Fixed audio player */}
+          </div>
+        </PlayerProvider>
       </AuthProvider>
     </Router>
   );
