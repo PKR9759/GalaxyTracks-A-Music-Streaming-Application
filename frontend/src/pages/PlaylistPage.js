@@ -91,6 +91,10 @@ const PlaylistPage = () => {
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-6 z-0">
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white z-10">{playlist.name}</h1>
                         <p className="text-md md:text-lg mt-1 z-10">Songs: {playlist.songs.length}</p>
+                        {/* Stylish Description */}
+                        <p className="text-lg md:text-xl italic mt-2 z-10 font-extrabold text-gradient">
+                            {playlist.description ? playlist.description : 'No description available.'}
+                        </p>
                     </div>
                 </div>
 

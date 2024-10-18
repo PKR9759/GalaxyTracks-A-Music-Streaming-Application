@@ -113,6 +113,7 @@ const getPlaylist = async (req, res) => {
             playlist: {
                 id: playlist._id,
                 name: playlist.name,
+                description: playlist.description,
                 userId: playlist.userId,
                 songs // Simplified song list for frontend
             }
@@ -123,7 +124,44 @@ const getPlaylist = async (req, res) => {
     }
 };
 
+const editPlaylist = async (req, res) => {
+    const { playlistId } = req.params;
+    const { name, description } = req.body;
 
+    // Retrieve token from the Authorization header
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ success: false, message: 'No token provided' });
+    }
+
+    // Verify token and extract userId
+    let userId;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        userId = decoded.id;
+    } catch (err) {
+        return res.status(401).json({ success: false, message: 'Invalid token' });
+    }
+
+    // Find and update the playlist
+    try {
+        const playlist = await Playlist.findOne({ _id: playlistId, userId: userId });
+        if (!playlist) {
+            return res.status(404).json({ success: false, message: 'Playlist not found' });
+        }
+
+        playlist.name = name || playlist.name;
+        playlist.description = description || playlist.description;
+
+        // Save the updated playlist
+        await playlist.save();
+
+        res.status(200).json({ success: true, message: 'Playlist updated successfully', playlist });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
 const deletePlaylist = async (req, res) => {
@@ -141,8 +179,9 @@ const deletePlaylist = async (req, res) => {
 
 
 const addSongToPlaylist = async (req, res) => {
-    const { playlistId, songId } = req.params; // Assuming songId is passed in the request parameters
-    console.log(playlistId);
+    const { playlistId ,songId} = req.params; // Assuming songId is passed in the request parameters
+    
+    console.log(playlistId,songId);
     try {
         const playlist = await Playlist.findById(playlistId);
         if (!playlist) {
@@ -191,4 +230,4 @@ const removeSongFromPlaylist = async (req, res) => {
     }
 };
 
-module.exports = { createPlaylist, getPlaylists, getPlaylist, deletePlaylist,addSongToPlaylist,removeSongFromPlaylist };
+module.exports = { createPlaylist, getPlaylists, getPlaylist, editPlaylist,deletePlaylist,addSongToPlaylist,removeSongFromPlaylist };

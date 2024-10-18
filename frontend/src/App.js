@@ -7,7 +7,7 @@ import PlaylistPage from './pages/PlaylistPage';
 import ProfilePage from './pages/ProfilePage';
 import SparksPage from './pages/SparksPage';
 import PlaylistsPage from './pages/PlaylistsPage';
-import CreatePlaylistPage from './pages/CreatePlaylistPage';
+import CreateAndUpdatePlaylistPage from './pages/CreateAndUpdatePlaylistPage';
 import PlayerPage from './pages/PlayerPage';
 import SearchPage from './pages/SearchPage';
 import AboutUsPage from './pages/AboutUsPage'; 
@@ -35,7 +35,8 @@ function App() {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/sparks" element={<SparksPage />} />
                   <Route path="/playlists" element={<PlaylistsPage />} />
-                  <Route path="/createPlaylist" element={<CreatePlaylistPage />} />
+                  <Route path="/createPlaylist" element={<CreateAndUpdatePlaylistPage />} />
+                  <Route path="/createPlaylist/:playlistId" element={<CreateAndUpdatePlaylistPage />} /> {/* Route for editing */}
                   <Route path="/search" element={<SearchPage />} />
                   <Route path="/about" element={<AboutUsPage />} />
                   <Route path="*" element={<NotFoundPage />} />

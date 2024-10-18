@@ -3,9 +3,9 @@ import axios from 'axios';
 import BASE_URL from '../apiConfig';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
-import { FaEllipsisV } from 'react-icons/fa'; // Importing a playlist icon from Material Design icons
 import { usePlayer } from '../contexts/PlayerContext';
-
+import { FaList, FaPlus } from 'react-icons/fa';
+import { toast, ToastContainer } from 'react-toastify';
 
 const SearchPage = () => {
     const [query, setQuery] = useState('');  // Search query
@@ -16,6 +16,9 @@ const SearchPage = () => {
     const [hasMore, setHasMore] = useState(true);  // Check if more data is available
     const [isFetchingMore, setIsFetchingMore] = useState(false);  // Loading more state
     const { updateTrackList, playTrack } = usePlayer();
+    const [showMenuIndex, setShowMenuIndex] = useState(-1);
+    const [playlists, setPlaylists] = useState([]);
+
     // Reset songs and pagination when query changes
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -35,6 +38,24 @@ const SearchPage = () => {
 
         return () => clearTimeout(delayDebounceFn); // Cleanup timeout on unmount or new keystroke
     }, [query]);
+
+    useEffect(()=>{
+        const fetchUserPlaylists = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await axios.get(`${BASE_URL}/playlists/all`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setPlaylists(response.data.playlists);
+            } catch (err) {
+                console.error('Error fetching playlists:', err);
+            }
+        };
+
+        fetchUserPlaylists();
+    },[])
 
     // Fetch songs based on query and page number
     const searchSongs = async (searchQuery, pageNumber) => {
@@ -71,7 +92,6 @@ const SearchPage = () => {
         }
     };
 
-
     const handlePlay = (songList, songIndex) => {
         console.log(songList);
         const formattedTracks = songList.map(song => ({
@@ -83,7 +103,6 @@ const SearchPage = () => {
         updateTrackList(formattedTracks);
         playTrack(songIndex);
     };
-
 
     // Infinite scroll handler
     useEffect(() => {
@@ -111,8 +130,29 @@ const SearchPage = () => {
         }
     }, [page]);
 
+    const handleAddToPlaylist = async (songId, playlistId) => {
+        const token = localStorage.getItem('token');
+        console.log(songId, playlistId);
+        try {
+            await axios.post(`${BASE_URL}/playlists/${playlistId}/addSong/${songId}`,
+                {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            toast.success('Song added to playlist!');
+        } catch (err) {
+            console.error('Error adding song to playlist:', err);
+            toast.error('Failed to add song to playlist.');
+        }
+    };
+
+    const toggleMenu = (index) => {
+        setShowMenuIndex(showMenuIndex === index ? -1 : index);
+    };
+
     return (
-        <div className="bg-black min-h-screen text-white flex flex-col">
+        <div className="bg-black min-h-screen text-white flex flex-col relative"> {/* Added z-10 here */}
             <Navbar />
             <div className="pt-24 pb-16 px-4"> {/* Adjusted top padding */}
                 <h1 className="text-3xl font-bold mb-6">Search for Songs</h1>
@@ -135,11 +175,11 @@ const SearchPage = () => {
                 {/* Display search results */}
                 <div className="space-y-4 mt-6">
                     {songs.length > 0 ? (
-                        songs.map((song,index) => (
+                        songs.map((song, index) => (
                             <div
                                 key={song.id}
-                                className="flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer"
-                                onClick={() => handlePlay(songs,index)}  // Redirect to player page with song ID
+                                className="flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-3 cursor-pointer"
+                                onClick={() => handlePlay(songs, index)}  // Play the selected song
                             >
                                 {/* Song image */}
                                 <img
@@ -153,21 +193,58 @@ const SearchPage = () => {
                                     <h3 className="text-lg font-semibold">{song.name}</h3>
                                     <p className="text-gray-400">Artist: {song.artist}</p>
                                     <p className="text-gray-400">Album: {song.album}</p>
-                                    <button className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none">
-                                        <FaEllipsisV />
+                                    
+                                    {/* Add to playlist button */}
+                                    <button
+                                        onClick={(event) => {
+                                            event.stopPropagation(); // Prevents song from playing
+                                            toggleMenu(index);
+                                        }}
+                                        className="absolute top-5 right-5 text-white hover:text-gray-400 focus:outline-none flex items-center bg-gray-700 hover:bg-gray-600 rounded-md p-1" // Adjusted z-index
+                                    >
+                                        <FaList className="mr-1 text-white text-sm" />
+                                        <FaPlus className="text-white text-sm" />
                                     </button>
-                                </div>
-                            </div>
-                        ))
-                    ) : !loading && !error && query.trim() ? (
-                        <p className="text-gray-400">No songs found</p>
-                    ) : null}
-                </div>
 
-                {/* Show loading when fetching more data */}
-                {isFetchingMore && <p className="mt-4 text-lg">Loading more...</p>}
+                                    {/* Playlist options dropdown */}
+                                    
+                                </div>
+                                {showMenuIndex === index && (
+                                        <div className="absolute right-20 bg-gray-800 rounded-md shadow-lg mt-2 w-48 p-2"
+                                            style={{ border: '1px solid #444', backgroundColor: '#1f1f1f' }}>
+                                            <ul className="z-50">
+                                                {playlists.map((playlist) => (
+                                                    <li key={playlist.id}>
+                                                        <button
+                                                            className="block w-full px-4 py-2 text-sm text-white bg-black-700 hover:bg-gray-700 rounded-md focus:outline-none"
+                                                            onClick={(event) => {
+                                                                event.stopPropagation();
+                                                                handleAddToPlaylist(song.id, playlist.id);
+                                                            }}
+                                                        >
+                                                            {playlist.name}
+                                                        </button>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+
+                            </div>
+                            
+                        ))
+                    ) : (
+                        <p className="mt-4 text-lg">No songs found</p>
+                    )}
+
+                    {/* Loading indicator for pagination */}
+                    {isFetchingMore && <p className="mt-4 text-lg">Loading more songs...</p>}
+                </div>
             </div>
-            <Footer />
+
+            <Footer /> {/* Footer component */}
+            <ToastContainer /> {/* Toast notifications */}
         </div>
     );
 };

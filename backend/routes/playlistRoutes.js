@@ -9,5 +9,5 @@ router.get('/:playlistId', playlistController.getPlaylist);
 router.delete('/:playlistId', playlistController.deletePlaylist); 
 router.post('/:playlistId/addSong/:songId', playlistController.addSongToPlaylist); 
 router.post('/:playlistId/removeSong/:songId', playlistController.removeSongFromPlaylist); 
-
+router.put('/:playlistId', playlistController.editPlaylist);
 module.exports = router;
