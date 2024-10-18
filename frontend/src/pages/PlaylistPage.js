@@ -5,7 +5,7 @@ import BASE_URL from '../apiConfig';
 import { usePlayer } from '../contexts/PlayerContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';  
-import { FaEllipsisV } from 'react-icons/fa'; 
+import { FaMinusCircle } from 'react-icons/fa'; // Import remove icon
 
 const PlaylistPage = () => {
     const { playlistId } = useParams();
@@ -26,11 +26,9 @@ const PlaylistPage = () => {
                 if (response.data.success) {
                     setPlaylist(response.data.playlist);
                 } else {
-                    // toast.error('Playlist not found.');
                     setPlaylist(null);
                 }
             } catch (error) {
-                // toast.error('Error fetching playlist: ' + (error.response?.data?.message || 'Server error'));
                 setPlaylist(null);
             } finally {
                 setLoading(false);
@@ -39,6 +37,28 @@ const PlaylistPage = () => {
 
         fetchPlaylist();
     }, [playlistId]);
+
+    // Remove song from the playlist
+    const handleRemoveSong = async (songId) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.post(`${BASE_URL}/playlists/${playlistId}/removeSong/${songId}`, {}, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (response.data.success) {
+                // Update playlist state by filtering out the removed song
+                setPlaylist((prevPlaylist) => ({
+                    ...prevPlaylist,
+                    songs: prevPlaylist.songs.filter(song => song.id !== songId),
+                }));
+            } else {
+                // Handle error (e.g., show a notification)
+            }
+        } catch (error) {
+            // Handle error (e.g., show a notification)
+        }
+    };
 
     // Display loading indicator while fetching data
     if (loading) {
@@ -66,7 +86,6 @@ const PlaylistPage = () => {
 
     // Handle playing a song
     const handlePlay = (songList, songIndex) => {
-        console.log(songList);
         const formattedTracks = songList.map(song => ({
             url: song.url,
             title: song.name,
@@ -91,7 +110,6 @@ const PlaylistPage = () => {
                     <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center p-6 z-0">
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white z-10">{playlist.name}</h1>
                         <p className="text-md md:text-lg mt-1 z-10">Songs: {playlist.songs.length}</p>
-                        {/* Stylish Description */}
                         <p className="text-lg md:text-xl italic mt-2 z-10 font-extrabold text-gradient">
                             {playlist.description ? playlist.description : 'No description available.'}
                         </p>
@@ -130,9 +148,17 @@ const PlaylistPage = () => {
                                         <p className="text-gray-400">Duration: {Math.round(song.duration / 60)} mins</p>
                                     </div>
 
-                                    {/* Button on the right-hand side */}
-                                    <button className="absolute top-1/2 transform -translate-y-1/2 right-4 text-white hover:text-gray-400 focus:outline-none">
-                                        <FaEllipsisV />
+                                    {/* Remove button */}
+                                    <button 
+                                        className="absolute top-1/2 transform -translate-y-1/2 right-8 text-white hover:text-red-500 focus:outline-none"
+                                        title="Remove from playlist"
+
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent song play when clicking the remove button
+                                            handleRemoveSong(song.id);
+                                        }}
+                                    >
+                                        <FaMinusCircle size={20} />
                                     </button>
                                 </div>
                             ))
