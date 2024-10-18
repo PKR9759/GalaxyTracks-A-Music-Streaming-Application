@@ -21,9 +21,7 @@ const searchSongs = async (req, res) => {
             album: song.album.name || 'Unknown Album',  // Album name
             duration: song.duration || 0,  // Duration if available
             image: song.image[0]?.url || 'No Image',  // First image URL if available
-            language: song.language || 'Unknown',  // Language if available
-            hasLyrics: song.hasLyrics || false,  // Whether the song has lyrics
-            url: song.url,  // Song URL (for playback or more details)
+            url: song.downloadUrl[0].url  // Song URL (for playback or more details)
         }));
 
         res.status(200).json({ success: true, songs });

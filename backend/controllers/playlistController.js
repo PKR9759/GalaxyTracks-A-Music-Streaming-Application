@@ -87,10 +87,11 @@ const getPlaylist = async (req, res) => {
                 // Extract the fields needed by the frontend
                 return {
                     id: songId, // Include song ID in the response
-                    title: songData.name,
-                    primary_artists: songData.artists?.primary.map(artist => artist.name).join(', '), // Extract primary artists
+                    name: songData.name,
+                    artist:songData.artists?.primary.map(artist => artist.name).join(', '), // Extract primary artists
                     duration: songData.duration, // Duration in seconds
                     image: songData.image[1]?.url || songData.image[0]?.url || '', // Use the second image if available, fallback to the first
+                    url: songData.downloadUrl[0].url
                 };
             } catch (error) {
                 console.error(`Error fetching song ${songId}:`, error.message);

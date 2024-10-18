@@ -4,6 +4,8 @@ import BASE_URL from '../apiConfig';
 import Navbar from '../components/Navbar'; // Import Navbar
 import Footer from '../components/Footer'; // Import Footer
 import { FaEllipsisV } from 'react-icons/fa'; // Importing a playlist icon from Material Design icons
+import { usePlayer } from '../contexts/PlayerContext';
+
 
 const SearchPage = () => {
     const [query, setQuery] = useState('');  // Search query
@@ -13,7 +15,7 @@ const SearchPage = () => {
     const [page, setPage] = useState(1);  // Current page number (start from 1)
     const [hasMore, setHasMore] = useState(true);  // Check if more data is available
     const [isFetchingMore, setIsFetchingMore] = useState(false);  // Loading more state
-
+    const { updateTrackList, playTrack } = usePlayer();
     // Reset songs and pagination when query changes
     useEffect(() => {
         const delayDebounceFn = setTimeout(() => {
@@ -69,6 +71,20 @@ const SearchPage = () => {
         }
     };
 
+
+    const handlePlay = (songList, songIndex) => {
+        console.log(songList);
+        const formattedTracks = songList.map(song => ({
+            url: song.url,
+            title: song.name,
+            tags: [song.artist],
+            image: song.image,
+        }));
+        updateTrackList(formattedTracks);
+        playTrack(songIndex);
+    };
+
+
     // Infinite scroll handler
     useEffect(() => {
         const handleScroll = () => {
@@ -119,11 +135,11 @@ const SearchPage = () => {
                 {/* Display search results */}
                 <div className="space-y-4 mt-6">
                     {songs.length > 0 ? (
-                        songs.map((song) => (
+                        songs.map((song,index) => (
                             <div
                                 key={song.id}
                                 className="flex items-center p-3 bg-[#1F1F1F] rounded-lg shadow-md transition-transform duration-300 transform hover:scale-102 hover:translate-x-4 cursor-pointer"
-                                onClick={() => window.location.href = `/player/${song.id}`}  // Redirect to player page with song ID
+                                onClick={() => handlePlay(songs,index)}  // Redirect to player page with song ID
                             >
                                 {/* Song image */}
                                 <img
