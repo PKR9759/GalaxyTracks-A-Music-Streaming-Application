@@ -8,7 +8,7 @@ const searchRoutes = require('./routes/searchRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const songRoutes = require('./routes/songRoutes');
 const userRoutes =require('./routes/userRoutes');
-
+const sparksRoutes = require('./routes/sparksRoutes');
 
 const cors= require('cors');
 const cookieParser = require('cookie-parser');
@@ -19,6 +19,9 @@ app.use(cors());
 app.use(cookieParser());
 const PORT =process.env.PORT;
 
+app.use(express.json({ limit: '10kb' })); // Set this to the limit you need
+app.use(express.urlencoded({ limit: '10kb', extended: true })); 
+
 app.use(express.json());
 app.use('/api/auth',authRoutes);
 app.use('/api/home', homeRoutes);
@@ -27,6 +30,10 @@ app.use('/api/search', searchRoutes);
 app.use('/api/category', categoryRoutes);
 app.use('/api/song', songRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/sparks', sparksRoutes);
+
+
+
 
 // MongoDB connection 
 mongoose.connect(process.env.MONGO_URI)

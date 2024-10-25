@@ -1,140 +1,95 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
+import { FaPlay, FaPause } from 'react-icons/fa';
 
-// Dummy data for song clips
-const dummyClips = [
-    {
-        id: '1',
-        title: 'Ocean Drive',
-        artist: 'Duke Dumont',
-        lyrics: 'In the night, there’s a light...',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
-        visual: 'https://via.placeholder.com/600x400/FF5733/FFFFFF?text=Ocean+Drive',
-    },
-    {
-        id: '2',
-        title: 'Sunflower',
-        artist: 'Post Malone',
-        lyrics: 'You’re a sunflower...',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
-        visual: 'https://via.placeholder.com/600x400/FFC300/FFFFFF?text=Sunflower',
-    },
-    {
-        id: '3',
-        title: 'Blinding Lights',
-        artist: 'The Weeknd',
-        lyrics: 'I said, ooh, I’m blinded by the lights...',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-        visual: 'https://via.placeholder.com/600x400/DAF7A6/FFFFFF?text=Blinding+Lights',
-    },
-    {
-        id: '4',
-        title: 'Shape of You',
-        artist: 'Ed Sheeran',
-        lyrics: 'I’m in love with the shape of you...',
-        url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
-        visual: 'https://via.placeholder.com/600x400/C70039/FFFFFF?text=Shape+of+You',
-    },
-];
+const SparksPage = () => {
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [showIcon, setShowIcon] = useState(false);
+    const [sparks, setSparks] = useState([]);
+    const [currentSparkIndex, setCurrentSparkIndex] = useState(0);
+    const [audio] = useState(new Audio()); // Initialize audio object
 
-const Sparks = () => {
-    const [currentClip, setCurrentClip] = useState(dummyClips[0]);
-    const [prevClip, setPrevClip] = useState(null);
-    const audioRef = useRef(null);
-    const [isAudioReady, setIsAudioReady] = useState(false);
-    const [isUserInteracted, setIsUserInteracted] = useState(false); // Track user interaction
-
-    const playClip = () => {
-        if (audioRef.current) {
-            audioRef.current.play();
-        }
-    };
-
-    const pauseClip = () => {
-        if (audioRef.current) {
-            audioRef.current.pause();
-        }
-    };
-
-    const getRandomClip = () => {
-        const randomIndex = Math.floor(Math.random() * dummyClips.length);
-        return dummyClips[randomIndex];
-    };
-
-    const nextClip = () => {
-        const newClip = getRandomClip();
-        setPrevClip(currentClip); // Store previous clip for animation
-        setCurrentClip(newClip);
-        if (isUserInteracted) { // Only change source if user has interacted
-            audioRef.current.src = newClip.url; // Update source for audio
-            playClip(); // Play immediately after changing source
-        }
-    };
-
-    const handleKeyDown = (event) => {
-        if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-            if (!isUserInteracted) {
-                setIsUserInteracted(true); // Mark user as interacted
-                audioRef.current.src = currentClip.url; // Set audio source on first interaction
-                playClip(); // Start playing
+    const fetchSpark = async () => {
+        try {
+            const response = await fetch('/api/sparks/stream'); // Request without specific URL
+            if (response.ok) {
+                const sparkUrl = response.url; // URL from the backend
+                console.log("Fetched Spark URL:", sparkUrl); // Log the URL
+                setSparks((prevSparks) => [...prevSparks, sparkUrl]); // Append to sparks list
+                setCurrentSparkIndex(sparks.length); // Update index to newly added spark
+                playSpark(sparkUrl); // Play the new spark directly
+            } else {
+                console.error("Failed to fetch spark:", response.statusText);
             }
-            nextClip();
+        } catch (error) {
+            console.error('Error fetching spark:', error);
+        }
+    };
+
+    const playSpark = (url) => {
+        audio.src = url; // Set audio source
+        audio.play()
+            .then(() => {
+                setIsPlaying(true);
+                showPlayPauseIcon();
+            })
+            .catch((err) => console.error("Error playing audio:", err));
+    };
+
+    const showPlayPauseIcon = () => {
+        setShowIcon(true);
+        setTimeout(() => setShowIcon(false), 1000); // Icon visible for 1 sec
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'ArrowDown') {
+            fetchSpark(); // Fetch a new spark on down arrow key
+        } else if (e.key === 'ArrowUp') {
+            if (currentSparkIndex > 0) {
+                setCurrentSparkIndex(currentSparkIndex - 1); // Go to previous spark
+                playSpark(sparks[currentSparkIndex - 1]); // Play previous spark
+            }
         }
     };
 
     useEffect(() => {
-        window.addEventListener('keydown', handleKeyDown);
+        fetchSpark(); // Fetch the first spark when the component mounts
+        window.addEventListener('keydown', handleKeyDown); // Listen for keydown events
+
         return () => {
-            window.removeEventListener('keydown', handleKeyDown);
+            window.removeEventListener('keydown', handleKeyDown); // Clean up event listener
+            audio.pause(); // Pause audio when component unmounts
         };
     }, []);
 
-    useEffect(() => {
-        // Set the audio source and update ready state
-        if (audioRef.current) {
-            audioRef.current.src = currentClip.url;
-            audioRef.current.load();
-            audioRef.current.oncanplay = () => {
-                setIsAudioReady(true); // Audio is ready to play
-            };
-            audioRef.current.onended = nextClip; // Go to next clip when current ends
-        }
-    }, [currentClip]);
-
     return (
-        <div className="bg-black min-h-screen flex flex-col items-center justify-center overflow-hidden">
-            <div className={`flex flex-col items-center justify-center w-full h-full relative transition-transform duration-300 ease-in-out ${prevClip ? 'transform -translate-y-12' : ''}`}>
-                {prevClip && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-300 ease-in-out">
-                        <img
-                            src={prevClip.visual}
-                            alt={`${prevClip.title} visual`}
-                            className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-lg border-4 border-red-600"
-                            style={{ filter: 'drop-shadow(0 0 20px rgba(255, 0, 0, 0.8))' }}
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col justify-center items-center p-6">
-                            <h3 className="text-4xl font-bold text-white">{prevClip.title}</h3>
-                            <p className="text-lg text-gray-300">{prevClip.artist}</p>
-                            <p className="text-sm text-gray-400 mt-1">{prevClip.lyrics}</p>
-                        </div>
+        <div className="bg-black min-h-screen flex items-center justify-center overflow-hidden">
+            {/* Sparks Box */}
+            <div
+                onClick={() => {
+                    if (isPlaying) {
+                        audio.pause();
+                    } else {
+                        playSpark(sparks[currentSparkIndex]);
+                    }
+                    setIsPlaying(!isPlaying);
+                }}
+                className="relative w-[90vw] max-w-[540px] h-[90vh] bg-gray-900 rounded-md overflow-hidden flex items-center justify-center"
+                style={{ aspectRatio: '9/16' }}
+            >
+                {/* Spark Title at Bottom */}
+                <div className="absolute bottom-4 left-4 right-4 text-center text-white text-lg font-semibold truncate">
+                    {sparks[currentSparkIndex] ? `Playing Spark ${currentSparkIndex + 1}` : 'Loading...'}
+                </div>
+
+                {/* Play/Pause Icon */}
+                {showIcon && (
+                    <div className="absolute text-white text-6xl flex items-center justify-center">
+                        {isPlaying ? <FaPause /> : <FaPlay />}
                     </div>
                 )}
-                <div className="w-full h-full flex flex-col items-center justify-center transition-all duration-500 ease-in-out">
-                    <img
-                        src={currentClip.visual}
-                        alt={`${currentClip.title} visual`}
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg shadow-lg border-4 border-red-600"
-                        style={{ filter: 'drop-shadow(0 0 20px rgba(255, 0, 0, 0.8))' }}
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-70 flex flex-col justify-center items-center p-6">
-                        <h3 className="text-4xl font-bold text-white">{currentClip.title}</h3>
-                        <p className="text-lg text-gray-300">{currentClip.artist}</p>
-                        <p className="text-sm text-gray-400 mt-1">{currentClip.lyrics}</p>
-                        <audio ref={audioRef} />
-                    </div>
-                </div>
             </div>
         </div>
     );
 };
 
-export default Sparks;
+export default SparksPage;
