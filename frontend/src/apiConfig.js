@@ -1,4 +1,4 @@
-// src/apiConfig.js
-const BASE_URL = 'http://localhost:8000/api'; // Update this URL to match your backend server's URL and port
+
+const BASE_URL = 'galaxy-tracks-server-api.vercel.app/api'
 
 export default BASE_URL;
