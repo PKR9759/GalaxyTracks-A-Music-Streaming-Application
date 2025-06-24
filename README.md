@@ -1,66 +1,59 @@
-# 🎵 GalaxyTracks - Modern Music Player 🚀
+# 🎵 GalaxyTracks - A Music Streaming Web Application
 
-![Music Player](https://img.shields.io/badge/-Music%20Player-9cf) ![React](https://img.shields.io/badge/-React-61DAFB?logo=react&logoColor=white) ![Responsive](https://img.shields.io/badge/-Responsive-green) ![Styled](https://img.shields.io/badge/-Styled%20UI-orange)
+**GalaxyTracks** is a modern and stylish music streaming web app with features like playlist creation, full music player controls, user profile management, search with lazy loading, and smooth UI animations. It’s built to deliver an immersive audio experience with functionality similar to modern streaming platforms.
 
-GalaxyTracks is a sleek, modern web-based music player with a persistent audio player and intuitive user interface.
+---
 
 ## ✨ Features
 
-### 🎧 Core Player
-- 🔊 Persistent sticky player across all pages
-- ⏯️ Play/pause, volume controls
-- 🎼 Now playing display with progress bar
+- 🎧 Sticky music player available across all pages
+- 📂 Playlist Management (CRUD)
+- 🔍 Search songs with lazy loading and bounce animation
+- 👤 User Profile Management (update preferences, image, etc.)
+- 🔄 JWT-based user authentication (register/login/logout)
+- 🖼️ Fully responsive, dark-themed UI with glowing effects
+- ⚙️ Context-based global state or Redux (if applicable)
+- 🧠 Smooth routing using React Router
+- 🔥 Built using full MERN Stack
 
-### 🗃️ Music Management
-- 📁 **Playlist System**:
-  - 🆕 Create custom playlists
-  - ➕/➖ Add/remove songs
-- 🔍 **Advanced Search**:
-  - 🦥 Lazy loading results
-  - ⏳ Debounced input
+---
 
-### 👤 User System
-- 🔐 Authentication (Login/Register)
-- 🖼️ Profile customization
+## 🧑‍💻 Tech Stack
 
-### ⚡ Performance
-- � Lazy-loaded components
-- � Efficient audio streaming
-- 🎯 Optimized search
+### 🖥️ Frontend:
+- React.js
+- Tailwind CSS
+- React Router DOM
+- Context API 
+- Axios
 
-### 🎨 UI/UX
-- 💅 Fully styled modern interface
-- 💡 Intuitive navigation
-- 🔄 Smooth animations
+### 🌐 Backend:
+- Node.js
+- Express.js
+- MongoDB (Mongoose)
+- JWT (Authentication)
+- Bcrypt.js
 
-## 🛠️ Tech Stack
+---
 
-### Frontend
-| Technology | Purpose |
-|------------|---------|
-| ![React](https://img.shields.io/badge/React-20232A?style=flat&logo=react) | UI Framework |
-| ![Styled Components](https://img.shields.io/badge/styled--components-DB7093?style=flat&logo=styled-components) | CSS-in-JS |
-| ![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios) | HTTP Client |
-
-### Backend (if applicable)
-| Technology | Purpose |
-|------------|---------|
-| ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs) | Runtime |
-| ![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express) | Web Framework |
-| ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb) | Database |
-
-## 🚀 Installation
+## 🚀 Getting Started
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/galaxytracks.git
+git clone https://github.com/PKR9759/GalaxyTracks-A-Music-Streaming-Application.git
 
-# Navigate to project directory
-cd galaxytracks
-
-# Install dependencies
+cd frontend
 npm install
+npm run dev
 
-# Start development server
-npm start
+cd backend
+npm install
+node index.js
+
+
+##🔑 Environment Variables:
+Create a .env file in backend/ with:
+
+
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
 
