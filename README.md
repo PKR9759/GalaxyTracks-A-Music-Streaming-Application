@@ -35,25 +35,36 @@
 - Bcrypt.js
 
 ---
+## Screenshots 
+![image](https://github.com/user-attachments/assets/f8670091-4f4c-4102-87bc-52352504e50f)
 
+![image](https://github.com/user-attachments/assets/c120e4f2-cb8d-46fc-bb22-79628cb5725f)
+
+![image](https://github.com/user-attachments/assets/38c26b5a-47e2-448f-bba6-42da9d988b80)
+
+![image](https://github.com/user-attachments/assets/424ae5fb-d283-4237-ab63-266fda904fc9)
+
+
+
+
+---
 ## 🚀 Getting Started
 
 ```bash
 git clone https://github.com/PKR9759/GalaxyTracks-A-Music-Streaming-Application.git
 
-cd frontend
-npm install
-npm run dev
-
+# Install server dependencies
 cd backend
 npm install
-node index.js
+
+# Install client dependencies
+cd ../frontend
+npm install
 
 
-##🔑 Environment Variables:
-Create a .env file in backend/ with:
-
+# Environment Variables:
+#Create a .env file in backend/ with:
 
 MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-
+JWT_SECRET=your_jwt_secret_key
+PORT=8000
